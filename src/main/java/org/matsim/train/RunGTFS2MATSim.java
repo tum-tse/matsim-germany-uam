@@ -68,7 +68,7 @@ public class RunGTFS2MATSim {
 
 		log.info("writing transit schedule and vehicles");
 
-		new VehicleWriterV1(scenario.getVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
 		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(outputDir+"GTFSTransitScheduleDB.xml.gz");
 		new NetworkWriter(scenario.getNetwork()).write(outputDir+"GTFSNetworkDB.xml.gz");
 		

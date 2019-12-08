@@ -50,7 +50,7 @@ public class CreatePtScheduleAndVehiclesFromGtfs {
 
     public Scenario run(String gtfsZipFile) {
 
-        final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
+        final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:31467");
         final LocalDate date = LocalDate.parse("2016-11-24");
 
         log.info("GTFS zip file: " + gtfsZipFile);
