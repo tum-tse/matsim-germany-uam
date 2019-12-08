@@ -21,6 +21,8 @@
 
 package org.matsim.demand;
 
+import org.matsim.api.core.v01.population.Population;
+
 /**
 * @author smueller
 */
@@ -31,17 +33,17 @@ public class RunCreateDemand {
 		
 		boolean train = true;
 		boolean car = false;
-		boolean airplane = true;
+		boolean airplane = false;
 		boolean pt = false;
 		boolean bike = false;
 		boolean walk = false;
 		
-		double sample = 0.1;
+		double sample = 0.5;
 		
-		String outputPopulationFile = "population.xml";
+		String outputPopulationFile = "populationTrain" + 100 * sample + "pct.xml";
 		
 		
-		CreateDemand.create(outputPopulationFile, sample, train, car, airplane, pt, bike, walk);
+		Population population = CreateDemand.create(outputPopulationFile, sample, train, car, airplane, pt, bike, walk);
 
 	}
 
