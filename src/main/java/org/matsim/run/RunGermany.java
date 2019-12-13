@@ -65,15 +65,24 @@ import org.matsim.contrib.accessibility.utils.MergeNetworks;
 
 public class RunGermany {
 	
-	private static final String inputNetworkFile = "../matsim-input/germany/network.xml.gz";
-	private static final String inputDBGTFSNetworkFile = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/GTFSNetworkDB.xml.gz";
-	private static final String inputAirplaneNetworkFile = "../matsim-input/germany/air_network.xml";
-	private static final String inputPlansFile = "../matsim-input/germany/populationTrainPlaneBERMUC5.0pct.xml";
-	private static final String inputDBGTFSScheduleFile ="../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/GTFSTransitScheduleDB.xml.gz";
-	private static final String inputDBGTFSVehiclesFile ="../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/GTFSTransitVehiclesDB.xml.gz";
-	private static final String inputAirplaneScheduleFile = "../matsim-input/germany/flight_transit_schedule.xml";
-	private static final String inputAirplaneVehiclesFile ="../matsim-input/germany/flight_transit_vehicles.xml";
-	private static final String outputDir = "../matsim-input/germany/Output/";
+	private static final String inputDir ="../shared-svn/studies/countries/de/matsim-germany/matsim-input/";
+	private static final String outputDir = "../shared-svn/studies/countries/de/matsim-germany/matsim-output/";
+
+//	contains all primary, trunk and motorway roads from osm
+	private static final String inputNetworkRoads = 		inputDir + "network_osm.xml.gz";
+
+	//	contains all db ice and ic services from 2016 from gtfs data
+	private static final String inputNetworkTrain =		 	inputDir + "network_train_gtfs.xml.gz";
+	private static final String inputScheduleTrain =		inputDir + "transit_schedule_train_gtfs.xml.gz";
+	private static final String inputVehiclesTrain =		inputDir + "transit_vehicles_train.xml.gz";
+
+//	contains all german plane services from 09/09 from oag data
+	private static final String inputNetworkPlane = 		inputDir + "network_plane.xml";
+	private static final String inputSchedulePlane =		inputDir + "transit_schedule_plane.xml";
+	private static final String inputVehiclesPlane =		inputDir + "transit_vehicles_plane.xml";
+	
+	private static final String inputPlans = 				inputDir + "populationTrainPlaneBERMUC5.0pct.xml";
+
 	private static final int noOfThreads = 8;
 
 	public static void main(String[] args) {
@@ -132,11 +141,16 @@ public class RunGermany {
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
 		stratSetsReRoute.setWeight(1.0);
 		
+//		StrategySettings stratSetsChangeTripMode = new StrategySettings();
+//		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
+//		stratSetsChangeTripMode.setWeight(1.0);
+		
 		config.strategy().addStrategySettings(stratSetsReRoute);
+//		config.strategy().addStrategySettings(stratSetsChangeTripMode);
 		
-		config.network().setInputFile(inputNetworkFile);
+		config.network().setInputFile(inputNetworkRoads);
 		
-		config.plans().setInputFile(inputPlansFile);
+		config.plans().setInputFile(inputPlans);
 		
 		config.transit().setUseTransit(true);
 		
@@ -192,29 +206,29 @@ public class RunGermany {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-		Network DBNetwork = NetworkUtils.readNetwork(inputDBGTFSNetworkFile);
+		Network DBNetwork = NetworkUtils.readNetwork(inputNetworkTrain);
 		Set<String> trainModes = new HashSet<>();
 		trainModes.add(TransportMode.train);
 		DBNetwork.getLinks().values().forEach(l -> l.setAllowedModes(trainModes));
 		MergeNetworks.merge(scenario.getNetwork(),"", DBNetwork);
 		
 		Config trainConfig = ConfigUtils.createConfig();
-		trainConfig.transit().setTransitScheduleFile(inputDBGTFSScheduleFile);
-		trainConfig.transit().setVehiclesFile(inputDBGTFSVehiclesFile);
+		trainConfig.transit().setTransitScheduleFile(inputScheduleTrain);
+		trainConfig.transit().setVehiclesFile(inputVehiclesTrain);
 		Scenario trainScenario = ScenarioUtils.loadScenario(trainConfig);
 		trainScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
 		mergeSchedules(scenario.getTransitSchedule(), trainScenario.getTransitSchedule());
 		mergeVehicles(scenario.getTransitVehicles(), trainScenario.getTransitVehicles());
 		
-		Network airplaneNetwork = NetworkUtils.readNetwork(inputAirplaneNetworkFile);
+		Network airplaneNetwork = NetworkUtils.readNetwork(inputNetworkPlane);
 		Set<String> airplaneModes = new HashSet<>();
 		airplaneModes.add(TransportMode.airplane);
 		airplaneNetwork.getLinks().values().forEach(l -> l.setAllowedModes(airplaneModes));
 		MergeNetworks.merge(scenario.getNetwork(),"", airplaneNetwork);
 		
 		Config airplaneConfig = ConfigUtils.createConfig();
-		airplaneConfig.transit().setTransitScheduleFile(inputAirplaneScheduleFile);
-		airplaneConfig.transit().setVehiclesFile(inputAirplaneVehiclesFile);
+		airplaneConfig.transit().setTransitScheduleFile(inputSchedulePlane);
+		airplaneConfig.transit().setVehiclesFile(inputVehiclesPlane);
 		Scenario airplaneScenario = ScenarioUtils.loadScenario(airplaneConfig);
 		airplaneScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.airplane)));
 		mergeSchedules(scenario.getTransitSchedule(), airplaneScenario.getTransitSchedule());
@@ -273,8 +287,7 @@ class MyScoringFunction implements ScoringFunction {
 		
 		if (leg.getMode().equals(TransportMode.airplane) ) {
 			score -= 2 * 3600;
-			
-	
+		
 		}
 		
 		
