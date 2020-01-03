@@ -43,6 +43,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -139,14 +140,14 @@ public class RunGermany {
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
-		stratSetsReRoute.setWeight(1.0);
+		stratSetsReRoute.setWeight(0.15);
 		
-//		StrategySettings stratSetsChangeTripMode = new StrategySettings();
-//		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
-//		stratSetsChangeTripMode.setWeight(1.0);
+		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
+		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
+		stratSetsChangeExpBeta.setWeight(0.85);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
-//		config.strategy().addStrategySettings(stratSetsChangeTripMode);
+		config.strategy().addStrategySettings(stratSetsChangeExpBeta);
 		
 		config.network().setInputFile(inputNetworkRoads);
 		
@@ -155,8 +156,9 @@ public class RunGermany {
 		config.transit().setUseTransit(true);
 		
 		Set<String> transitModes = new HashSet<>();
-		transitModes.add(TransportMode.train);
-		transitModes.add(TransportMode.airplane);
+//		transitModes.add(TransportMode.train);
+//		transitModes.add(TransportMode.airplane);
+		transitModes.add("longDistancePt");
 		config.transit().setTransitModes(transitModes );
 
 		SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
