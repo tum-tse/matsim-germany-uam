@@ -216,7 +216,9 @@ public class CreateDemand {
 
 					}
 					
-					if (!originZone.equals(destinationZone)) {
+//					if (!originZone.equals(destinationZone)) {
+//					agents travelling from Berlin to Munich
+					if (originZone.equals("DE300") && destinationZone.equals("DE212") ) {
 						createPersons(sample, originZone, destinationZone, noOfAgents, mode, nextActType);
 					}
 					
