@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.analysis.TransportPlanningMainModeIdentifier;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -45,6 +46,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -70,7 +72,7 @@ public class RunGermany {
 	private static final String outputDir = "../shared-svn/studies/countries/de/matsim-germany/matsim-output/";
 
 //	contains all primary, trunk and motorway roads from osm
-	private static final String inputNetworkRoads = 		inputDir + "network_osm.xml.gz";
+	private static final String inputNetworkRoads = 		inputDir + "network_osm_secondary.xml.gz";
 
 	//	contains all db ice and ic services from 2016 from gtfs data
 	private static final String inputNetworkTrain =		 	inputDir + "network_train_gtfs.xml.gz";
@@ -90,7 +92,7 @@ public class RunGermany {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(10);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDir);
 		
@@ -100,29 +102,16 @@ public class RunGermany {
 		Collection<String> networkModes = new HashSet<>();
 		networkModes.add("car");
 		config.plansCalcRoute().setNetworkModes(networkModes);
-
-		ActivityParams originAcitivityParams = new ActivityParams("origin");
-		originAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(originAcitivityParams);
-		ActivityParams shopAcitivityParams = new ActivityParams("shop");
-		shopAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(shopAcitivityParams);
-		ActivityParams businessAcitivityParams = new ActivityParams("business");
-		businessAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(businessAcitivityParams);
-		ActivityParams holidayAcitivityParams = new ActivityParams("holiday");
-		holidayAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(holidayAcitivityParams);
-		ActivityParams workAcitivityParams = new ActivityParams("work");
-		workAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(workAcitivityParams);
-		ActivityParams educationAcitivityParams = new ActivityParams("education");
-		educationAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(educationAcitivityParams);
-		ActivityParams otherAcitivityParams = new ActivityParams("other");
-		otherAcitivityParams.setTypicalDuration(3600);
-		config.planCalcScore().addActivityParams(otherAcitivityParams);
 		
+//		we are only scoring trips
+		config.planCalcScore().addActivityParams(new ActivityParams("origin").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("shop").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("business").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("holiday").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("work").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("education").setScoringThisActivityAtAll(false));
+		config.planCalcScore().addActivityParams(new ActivityParams("other").setScoringThisActivityAtAll(false));
+				
 		config.qsim().setStartTime(0);
 		config.qsim().setEndTime(36. * 3600);
 		config.qsim().setNumberOfThreads(noOfThreads);
@@ -135,7 +124,7 @@ public class RunGermany {
 		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
 		
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		config.strategy().setMaxAgentPlanMemorySize(3);	
+//		config.strategy().setMaxAgentPlanMemorySize(3);	
 		config.strategy().clearStrategySettings();
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
@@ -198,7 +187,8 @@ public class RunGermany {
 		config.planCalcScore().addModeParams(scoreTrain);
 		
 		ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
-		scoreAirplane.setConstant(scorePt.getConstant());
+//		scoreAirplane.setConstant(scorePt.getConstant());
+		scoreAirplane.setConstant(-12.);
 		scoreAirplane.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
 		scoreAirplane.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
 		scoreAirplane.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
@@ -241,9 +231,10 @@ public class RunGermany {
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
-				this.bindScoringFunctionFactory().to( MyScoringFunctionFactory.class ) ;
+//				this.bindScoringFunctionFactory().to( MyScoringFunctionFactory.class ) ;
 //				install( new SwissRailRaptorModule() );
 				bind(RaptorParametersForPerson.class).to(AirplaneTrainSwitcherIndividualRaptorParametersForPerson.class);
+//				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
 		
