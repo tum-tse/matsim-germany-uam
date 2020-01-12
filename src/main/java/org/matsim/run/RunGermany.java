@@ -50,6 +50,7 @@ import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -72,6 +73,7 @@ public class RunGermany {
 	private static final String outputDir = "../shared-svn/studies/countries/de/matsim-germany/matsim-output/";
 
 //	contains all primary, trunk and motorway roads from osm
+//	private static final String inputNetworkRoads = 		inputDir + "network_osm_primary.xml.gz";
 	private static final String inputNetworkRoads = 		inputDir + "network_osm_secondary.xml.gz";
 
 	//	contains all db ice and ic services from 2016 from gtfs data
@@ -87,18 +89,21 @@ public class RunGermany {
 	private static final String inputPlans = 				inputDir + "populationTrainPlaneBERMUC5.0pct.xml";
 
 	private static final int noOfThreads = 8;
+	
+	private static final String runid = "ChangeTripMode_Secondary";
 
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(20);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDir);
-		
+		config.controler().setRunId(runid);
+
 		config.global().setCoordinateSystem("EPSG:31467");
 		config.global().setNumberOfThreads(noOfThreads);
-		
+				
 		Collection<String> networkModes = new HashSet<>();
 		networkModes.add("car");
 		config.plansCalcRoute().setNetworkModes(networkModes);
@@ -129,14 +134,24 @@ public class RunGermany {
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
-		stratSetsReRoute.setWeight(0.15);
+		stratSetsReRoute.setWeight(0.1);
+		
+		StrategySettings stratSetsChangeTripMode = new StrategySettings();
+		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
+		stratSetsChangeTripMode.setWeight(0.1);
+		
+		String[] changeModes = new String[2];
+		changeModes[0] = "car";
+		changeModes[1] = "longDistancePt";
+		config.changeMode().setModes(changeModes);
 		
 		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
 		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
-		stratSetsChangeExpBeta.setWeight(0.85);
+		stratSetsChangeExpBeta.setWeight(0.8);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
 		config.strategy().addStrategySettings(stratSetsChangeExpBeta);
+		config.strategy().addStrategySettings(stratSetsChangeTripMode);
 		
 		config.network().setInputFile(inputNetworkRoads);
 		
@@ -165,13 +180,23 @@ public class RunGermany {
 		
 		srrConfig.setUseIntermodalAccessEgress(true);
 		
-		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSet = new IntermodalAccessEgressParameterSet();
-		intermodalAccessEgressParameterSet.setMode("car");
-		intermodalAccessEgressParameterSet.setMaxRadius(500 * 1000);
-		intermodalAccessEgressParameterSet.setInitialSearchRadius(100 * 1000);
-		intermodalAccessEgressParameterSet.setSearchExtensionRadius(150 * 1000);
-//		intermodalAccessEgressParameterSet.setStopFilterAttribute("");
-		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSet);
+		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetAirportWithCar = new IntermodalAccessEgressParameterSet();
+		intermodalAccessEgressParameterSetAirportWithCar.setMode("car");
+		intermodalAccessEgressParameterSetAirportWithCar.setMaxRadius(500 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setInitialSearchRadius(125 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setSearchExtensionRadius(125 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setStopFilterAttribute("type");
+		intermodalAccessEgressParameterSetAirportWithCar.setStopFilterValue("airport");
+		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetAirportWithCar);
+		
+		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+		intermodalAccessEgressParameterSetTrainStationWithCar.setMode("car");
+		intermodalAccessEgressParameterSetTrainStationWithCar.setMaxRadius(100 * 1000);
+		intermodalAccessEgressParameterSetTrainStationWithCar.setInitialSearchRadius(20 * 1000);
+		intermodalAccessEgressParameterSetTrainStationWithCar.setSearchExtensionRadius(20 * 1000);
+		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterAttribute("type");
+		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
+		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
 		
 		config.addModule(srrConfig);
 		
@@ -209,6 +234,7 @@ public class RunGermany {
 		trainConfig.transit().setVehiclesFile(inputVehiclesTrain);
 		Scenario trainScenario = ScenarioUtils.loadScenario(trainConfig);
 		trainScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
+		trainScenario.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "trainStation"));
 		mergeSchedules(scenario.getTransitSchedule(), trainScenario.getTransitSchedule());
 		mergeVehicles(scenario.getTransitVehicles(), trainScenario.getTransitVehicles());
 		
@@ -223,6 +249,7 @@ public class RunGermany {
 		airplaneConfig.transit().setVehiclesFile(inputVehiclesPlane);
 		Scenario airplaneScenario = ScenarioUtils.loadScenario(airplaneConfig);
 		airplaneScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.airplane)));
+		airplaneScenario.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "airport"));
 		mergeSchedules(scenario.getTransitSchedule(), airplaneScenario.getTransitSchedule());
 		mergeVehicles(scenario.getTransitVehicles(), airplaneScenario.getTransitVehicles());
 		
@@ -234,7 +261,7 @@ public class RunGermany {
 //				this.bindScoringFunctionFactory().to( MyScoringFunctionFactory.class ) ;
 //				install( new SwissRailRaptorModule() );
 				bind(RaptorParametersForPerson.class).to(AirplaneTrainSwitcherIndividualRaptorParametersForPerson.class);
-//				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
+				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
 		
