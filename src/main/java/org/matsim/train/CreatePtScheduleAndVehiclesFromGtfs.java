@@ -48,20 +48,20 @@ public class CreatePtScheduleAndVehiclesFromGtfs {
 
     private static final Logger log = Logger.getLogger(CreatePtScheduleAndVehiclesFromGtfs.class);
 
-    public Scenario run(String gtfsZipFile) {
+    public Scenario run(String gtfsZipFile, String date, String networkPrefix) {
 
         final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:31467");
-        final LocalDate date = LocalDate.parse("2016-11-24");
+        final LocalDate localDate = LocalDate.parse(date);
 
         log.info("GTFS zip file: " + gtfsZipFile);
         
         // Convert GTFS to matsim transit schedule
-        Scenario scenario = createScenarioFromGtfsFile(gtfsZipFile, date, ct);
+        Scenario scenario = createScenarioFromGtfsFile(gtfsZipFile, localDate, ct);
 //        scenario.getConfig().global().setCoordinateSystem("WGS84");
 //        scenario.getConfig().network().setInputCRS("WGS84");
         
         //Create a network around the schedule
-        new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "DB_").createNetwork();;
+        new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), networkPrefix).createNetwork();;
         
         //Create simple transit vehicles with a pcu of 0
         new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
