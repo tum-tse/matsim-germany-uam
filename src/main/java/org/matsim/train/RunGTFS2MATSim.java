@@ -28,14 +28,25 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.utils.MergeNetworks;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 /**
 * @author smueller
@@ -44,20 +55,32 @@ import org.matsim.vehicles.VehicleWriterV1;
 public class RunGTFS2MATSim {
 	
 	private static final Logger log = Logger.getLogger(RunGTFS2MATSim.class);
-	private static final String inputGTFSFile = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/2016.zip";
+	private static final String DBGTFSFile = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/2016.zip";
+	private static final String VRRGTFSFile = "../shared-svn/projects/nemo_mercator/data/pt/vrr_gtfs_sep19.zip";
 	private static final String outputDir = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/";
 	
 	public static void main(String[] args) {
 		
-		Scenario scenario = createScenario();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		Scenario DBScenario = createScenario(DBGTFSFile, "2016-11-24", "DB_");
+		Scenario VRRScenario = createScenario(VRRGTFSFile, "2019-11-24", "VRR_");
+		
+		MergeNetworks.merge(scenario.getNetwork(), "", DBScenario.getNetwork());
+		mergeSchedules("DB_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), DBScenario.getTransitSchedule());
+		mergeVehicles("DB_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), DBScenario.getTransitVehicles());
+		
+		MergeNetworks.merge(scenario.getNetwork(), "", VRRScenario.getNetwork());
+		mergeSchedules("VRR_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), VRRScenario.getTransitSchedule());
+		mergeVehicles("VRR_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), VRRScenario.getTransitVehicles());
 
 		runScenario(scenario);
-
+		
 		
 	}
 
-	private static Scenario createScenario() {
-		Scenario scenario = new CreatePtScheduleAndVehiclesFromGtfs().run(inputGTFSFile);
+	private static Scenario createScenario(String gtfsZipFile, String date, String networkPrefix) {
+		Scenario scenario = new CreatePtScheduleAndVehiclesFromGtfs().run(gtfsZipFile, date, networkPrefix);
 		
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
@@ -66,14 +89,12 @@ public class RunGTFS2MATSim {
 //		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
 
-		log.info("writing transit schedule and vehicles");
-
-		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
-		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(outputDir+"GTFSTransitScheduleDB.xml.gz");
-		new NetworkWriter(scenario.getNetwork()).write(outputDir+"GTFSNetworkDB.xml.gz");
+//		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
+//		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(outputDir+"GTFSTransitScheduleDB.xml.gz");
+//		new NetworkWriter(scenario.getNetwork()).write(outputDir+"GTFSNetworkDB.xml.gz");
 		
-		log.info("Number transitVehicles in scenario: " + scenario.getTransitVehicles().getVehicles().size());
-		log.info("Number of links in scenario: " + scenario.getNetwork().getLinks().size());
+		log.info("Number transitVehicles in scenario from: " + networkPrefix + ": " + scenario.getTransitVehicles().getVehicles().size());
+		log.info("Number of links in scenario: " + networkPrefix + ": "+ scenario.getNetwork().getLinks().size());
 		return scenario;
 	}
 	
@@ -85,7 +106,7 @@ public class RunGTFS2MATSim {
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		config.global().setNumberOfThreads(16);
+		config.global().setNumberOfThreads(8);
 		
 		config.transit().setUseTransit(true);
 		
@@ -200,10 +221,14 @@ public class RunGTFS2MATSim {
 						}
 						
 						Double prevSpeed = linkMaxSpeed.get(linkId);
-						double newSpeed = scenario.getNetwork().getLinks().get(linkId).getLength() / (arrivalTime - departureTime);
-						
+						double newSpeed = 50.;
+						if (arrivalTime - departureTime != 0) {
+							newSpeed = scenario.getNetwork().getLinks().get(linkId).getLength() / (- 1 + arrivalTime - departureTime);
+						}
+
 						if(newSpeed > prevSpeed) {
 							linkMaxSpeed.replace(linkId, newSpeed);
+							
 						}
 						
 					}
@@ -227,6 +252,47 @@ public class RunGTFS2MATSim {
 			}
 		}
 		
+	}
+	
+	private static void mergeSchedules(String prefix, TransitScheduleFactory tsf, TransitSchedule schedule, TransitSchedule toBeMerged) {
+
+		toBeMerged.getTransitLines().values().forEach(transitLine -> {
+			TransitLine transitLineWithNewId = tsf.createTransitLine(Id.create(prefix + transitLine.getId().toString(), TransitLine.class));
+			transitLine.getRoutes().values().forEach(route -> {
+				transitLineWithNewId.addRoute(route);
+				
+				route.getStops().forEach(stop -> {
+					TransitStopFacility transitStopWithNewId = tsf.createTransitStopFacility(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class), stop.getStopFacility().getCoord(), stop.getStopFacility().getIsBlockingLane());
+					transitStopWithNewId.setName(stop.getStopFacility().getName());
+					transitStopWithNewId.setLinkId(stop.getStopFacility().getLinkId());
+					stop.setStopFacility(transitStopWithNewId);
+					if (!schedule.getFacilities().containsKey(transitStopWithNewId.getId())) {
+						schedule.addStopFacility(transitStopWithNewId);
+					}
+				});
+				route.getDepartures().values().forEach(dep -> {
+					dep.setVehicleId(Id.createVehicleId(prefix + dep.getVehicleId().toString()));
+				});
+			});
+			transitLineWithNewId.setName(transitLine.getName());
+			schedule.addTransitLine(transitLineWithNewId);
+		});
+	}
+
+	private static void mergeVehicles(String prefix, VehiclesFactory vehiclesFactory, Vehicles vehicles, Vehicles toBeMerged) {
+		
+		toBeMerged.getVehicleTypes().values().forEach(vehicleType -> {	
+			VehicleType vehicleTypeWithNewId = vehiclesFactory.createVehicleType(Id.create(prefix + vehicleType.getId().toString(), VehicleType.class));
+			vehicleTypeWithNewId.getCapacity().setSeats(1000);
+			vehicles.addVehicleType(vehicleTypeWithNewId);
+		});
+		toBeMerged.getVehicles().values().forEach(vehicle -> {
+			VehicleType vehicleTypeWithNewId = vehiclesFactory.createVehicleType(Id.create(prefix + vehicle.getType().getId().toString(), VehicleType.class));			
+			vehicleTypeWithNewId.getCapacity().setSeats(1000);
+			Vehicle vehicleWithNewId = vehiclesFactory.createVehicle(Id.createVehicleId(prefix + vehicle.getId().toString()),vehicleTypeWithNewId);
+			vehicles.addVehicle(vehicleWithNewId);
+		});
+
 	}
 
 }
