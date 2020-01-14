@@ -21,10 +21,18 @@
 
 package org.matsim.train;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -36,12 +44,19 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -59,6 +74,14 @@ public class RunGTFS2MATSim {
 	private static final String VRRGTFSFile = "../shared-svn/projects/nemo_mercator/data/pt/vrr_gtfs_sep19.zip";
 	private static final String outputDir = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/";
 	
+//	private static final List<Geometry> regions = ShapeFileReader.getAllFeatures("../shared-svn/projects/nemo_mercator/data/matsim_input/baseCase/ruhrgebiet_boundary.shp").stream() 
+//			.map(feature -> (Geometry)feature.getDefaultGeometry())
+//			.collect(Collectors.toList());
+	private final static Map<String, Geometry> regions = ShapeFileReader.getAllFeatures("../vg2500_geo84/vg2500_bld.shp").stream()
+			.collect(Collectors.toMap(feature -> (String) feature.getAttribute("GEN"), feature -> (Geometry) feature.getDefaultGeometry()));
+	
+	private static final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31467", TransformationFactory.WGS84);
+	
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -66,17 +89,18 @@ public class RunGTFS2MATSim {
 		Scenario DBScenario = createScenario(DBGTFSFile, "2016-11-24", "DB_");
 		Scenario VRRScenario = createScenario(VRRGTFSFile, "2019-11-24", "VRR_");
 		
-		MergeNetworks.merge(scenario.getNetwork(), "", DBScenario.getNetwork());
+//		MergeNetworks.merge(scenario.getNetwork(), "", DBScenario.getNetwork());
 		mergeSchedules("DB_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), DBScenario.getTransitSchedule());
 		mergeVehicles("DB_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), DBScenario.getTransitVehicles());
 		
-		MergeNetworks.merge(scenario.getNetwork(), "", VRRScenario.getNetwork());
+//		MergeNetworks.merge(scenario.getNetwork(), "", VRRScenario.getNetwork());
 		mergeSchedules("VRR_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), VRRScenario.getTransitSchedule());
 		mergeVehicles("VRR_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), VRRScenario.getTransitVehicles());
-
+		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write("GTFSTransitSchedule.xml");
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "").createNetwork();
+		setLinkSpeedsToMax(scenario);
 		runScenario(scenario);
-		
-		
+
 	}
 
 	private static Scenario createScenario(String gtfsZipFile, String date, String networkPrefix) {
@@ -87,7 +111,7 @@ public class RunGTFS2MATSim {
 		
 //		sets link speeds to the maximum speed of all train trips that travel on this link
 //		this should insure, that no trips are late, some may, however, be early
-		setLinkSpeedsToMax(scenario);
+//		setLinkSpeedsToMax(scenario);
 
 //		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
 //		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(outputDir+"GTFSTransitScheduleDB.xml.gz");
@@ -255,27 +279,35 @@ public class RunGTFS2MATSim {
 	}
 	
 	private static void mergeSchedules(String prefix, TransitScheduleFactory tsf, TransitSchedule schedule, TransitSchedule toBeMerged) {
-
-		toBeMerged.getTransitLines().values().forEach(transitLine -> {
+		 toBeMerged.getTransitLines().values().forEach(transitLine -> {
 			TransitLine transitLineWithNewId = tsf.createTransitLine(Id.create(prefix + transitLine.getId().toString(), TransitLine.class));
-			transitLine.getRoutes().values().forEach(route -> {
-				transitLineWithNewId.addRoute(route);
-				
-				route.getStops().forEach(stop -> {
-					TransitStopFacility transitStopWithNewId = tsf.createTransitStopFacility(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class), stop.getStopFacility().getCoord(), stop.getStopFacility().getIsBlockingLane());
-					transitStopWithNewId.setName(stop.getStopFacility().getName());
-					transitStopWithNewId.setLinkId(stop.getStopFacility().getLinkId());
-					stop.setStopFacility(transitStopWithNewId);
-					if (!schedule.getFacilities().containsKey(transitStopWithNewId.getId())) {
-						schedule.addStopFacility(transitStopWithNewId);
-					}
+			if (checkIfLineIsInShape(transitLine)) {
+				transitLine.getRoutes().values().forEach(route -> {
+					List<TransitRouteStop> stops = new ArrayList<>();
+					route.getStops().forEach(stop -> {
+						TransitStopFacility transitStopWithNewId;
+						if (!schedule.getFacilities().containsKey(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class))) {
+							transitStopWithNewId = tsf.createTransitStopFacility(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class), stop.getStopFacility().getCoord(), stop.getStopFacility().getIsBlockingLane());
+							transitStopWithNewId.setName(stop.getStopFacility().getName());
+							schedule.addStopFacility(transitStopWithNewId);
+						}
+						else {
+							transitStopWithNewId = schedule.getFacilities().get(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class));
+						}
+						TransitRouteStop transitRouteStopWithNewId = tsf.createTransitRouteStop(transitStopWithNewId, stop.getArrivalOffset(), stop.getDepartureOffset());
+						stops.add(transitRouteStopWithNewId);
+					});
+					TransitRoute transitRouteWithNewId = tsf.createTransitRoute(Id.create(prefix + route.getId().toString(), TransitRoute.class), route.getRoute(), stops, route.getTransportMode());
+					transitLineWithNewId.addRoute(transitRouteWithNewId);	
+					route.getDepartures().values().forEach(dep -> {
+						Departure departureWithNewId = tsf.createDeparture(Id.create(prefix + dep.getId().toString(), Departure.class), dep.getDepartureTime());
+						departureWithNewId.setVehicleId(Id.createVehicleId(prefix + dep.getVehicleId().toString()));
+						transitRouteWithNewId.addDeparture(departureWithNewId);
+					});
 				});
-				route.getDepartures().values().forEach(dep -> {
-					dep.setVehicleId(Id.createVehicleId(prefix + dep.getVehicleId().toString()));
-				});
-			});
 			transitLineWithNewId.setName(transitLine.getName());
 			schedule.addTransitLine(transitLineWithNewId);
+			}
 		});
 	}
 
@@ -294,5 +326,26 @@ public class RunGTFS2MATSim {
 		});
 
 	}
+	
+	private static boolean checkIfLineIsInShape(TransitLine line) {
+
+		boolean lineIsInShape = false;
+		for (TransitRoute route : line.getRoutes().values()) {
+			for (TransitRouteStop routeStop : route.getStops()) {
+				Coord coord = ct.transform(routeStop.getStopFacility().getCoord());
+				Geometry ageometry = regions.get("Nordrhein-Westfalen");
+				if (isInGeometry(coord,  ageometry)) {
+					lineIsInShape = true;
+				}
+			}
+		}
+		return lineIsInShape;
+	}
+	
+	private static boolean isInGeometry(Coord coord, Geometry geometry) {
+		return geometry.contains(MGC.coord2Point(coord));
+//		return geometries.stream().anyMatch(geometry -> geometry.contains(MGC.coord2Point(coord)));
+	}
+	
 
 }
