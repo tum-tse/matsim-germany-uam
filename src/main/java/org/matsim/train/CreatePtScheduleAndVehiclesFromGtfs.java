@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
@@ -61,7 +62,7 @@ public class CreatePtScheduleAndVehiclesFromGtfs {
 //        scenario.getConfig().network().setInputCRS("WGS84");
         
         //Create a network around the schedule
-        new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), networkPrefix).createNetwork();;
+//        new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), networkPrefix).createNetwork();
         
         //Create simple transit vehicles with a pcu of 0
         new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
