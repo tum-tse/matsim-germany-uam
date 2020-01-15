@@ -28,16 +28,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.MergeNetworks;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -70,14 +65,15 @@ import org.matsim.vehicles.VehiclesFactory;
 public class RunGTFS2MATSim {
 	
 	private static final Logger log = Logger.getLogger(RunGTFS2MATSim.class);
-	private static final String DBGTFSFile = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/2016.zip";
-	private static final String VRRGTFSFile = "../shared-svn/projects/nemo_mercator/data/pt/vrr_gtfs_sep19.zip";
-	private static final String outputDir = "../shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/";
+	private static final String svnDir = "../";
+	private static final String DBGTFSFile = svnDir + "shared-svn/studies/countries/de/train/db-fv-gtfs-master/2019.zip";
+	private static final String VRRGTFSFile = svnDir + "shared-svn/projects/nemo_mercator/data/pt/vrr_gtfs_sep19.zip";
+	private static final String outputDir = svnDir + "shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/";
 	
 //	private static final List<Geometry> regions = ShapeFileReader.getAllFeatures("../shared-svn/projects/nemo_mercator/data/matsim_input/baseCase/ruhrgebiet_boundary.shp").stream() 
 //			.map(feature -> (Geometry)feature.getDefaultGeometry())
 //			.collect(Collectors.toList());
-	private final static Map<String, Geometry> regions = ShapeFileReader.getAllFeatures("../vg2500_geo84/vg2500_bld.shp").stream()
+	private final static Map<String, Geometry> regions = ShapeFileReader.getAllFeatures(svnDir + "shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Bundeslaender/vg2500_geo84/vg2500_bld.shp").stream()
 			.collect(Collectors.toMap(feature -> (String) feature.getAttribute("GEN"), feature -> (Geometry) feature.getDefaultGeometry()));
 	
 	private static final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31467", TransformationFactory.WGS84);
@@ -85,42 +81,36 @@ public class RunGTFS2MATSim {
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2019-11-23", "DB_");
+		Scenario VRRScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(VRRGTFSFile, "2019-11-23", "VRR_");
 		
-		Scenario DBScenario = createScenario(DBGTFSFile, "2016-11-24", "DB_");
-		Scenario VRRScenario = createScenario(VRRGTFSFile, "2019-11-24", "VRR_");
-		
-//		MergeNetworks.merge(scenario.getNetwork(), "", DBScenario.getNetwork());
 		mergeSchedules("DB_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), DBScenario.getTransitSchedule());
 		mergeVehicles("DB_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), DBScenario.getTransitVehicles());
 		
-//		MergeNetworks.merge(scenario.getNetwork(), "", VRRScenario.getNetwork());
 		mergeSchedules("VRR_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), VRRScenario.getTransitSchedule());
 		mergeVehicles("VRR_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), VRRScenario.getTransitVehicles());
-		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write("GTFSTransitSchedule.xml");
+	
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "").createNetwork();
+		
+//		sets link speeds to the maximum speed of all train trips that travel on this link
+//		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
-		runScenario(scenario);
-
-	}
-
-	private static Scenario createScenario(String gtfsZipFile, String date, String networkPrefix) {
-		Scenario scenario = new CreatePtScheduleAndVehiclesFromGtfs().run(gtfsZipFile, date, networkPrefix);
+		
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_transitVehicles.xml.gz");
+		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_transitSchedule.xml.gz");
+		new NetworkWriter(scenario.getNetwork()).write(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_network.xml.gz");
 		
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
 		
-//		sets link speeds to the maximum speed of all train trips that travel on this link
-//		this should insure, that no trips are late, some may, however, be early
-//		setLinkSpeedsToMax(scenario);
+//		runScenario(scenario);
 
-//		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(outputDir+"GTFSTransitVehiclesDB.xml.gz");
-//		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(outputDir+"GTFSTransitScheduleDB.xml.gz");
-//		new NetworkWriter(scenario.getNetwork()).write(outputDir+"GTFSNetworkDB.xml.gz");
-		
-		log.info("Number transitVehicles in scenario from: " + networkPrefix + ": " + scenario.getTransitVehicles().getVehicles().size());
-		log.info("Number of links in scenario: " + networkPrefix + ": "+ scenario.getNetwork().getLinks().size());
-		return scenario;
 	}
+
+//	private static Scenario createScenario(String gtfsZipFile, String date, String networkPrefix) {
+//		Scenario scenario = new CreatePtScheduleAndVehiclesFromGtfs().run(gtfsZipFile, date, networkPrefix);
+//		return scenario;
+//	}
 	
 	private static void runScenario(Scenario scenario) {
 		
