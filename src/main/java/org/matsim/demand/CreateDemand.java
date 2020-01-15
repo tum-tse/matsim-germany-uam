@@ -174,13 +174,15 @@ public class CreateDemand {
 					
 					switch(splitColumn[0]) {
 					case "Bahn":
-						mode = TransportMode.train;
+//						mode = TransportMode.train;
+						mode = "longDistancePt";
 						break;
 					case "MIV":
 						mode = TransportMode.car;
 						break;
 					case "Luft":
-						mode = TransportMode.airplane;
+//						mode = TransportMode.airplane;
+						mode = "longDistancePt";
 						break;
 					case "OESPV":
 						mode = TransportMode.pt;
@@ -216,9 +218,9 @@ public class CreateDemand {
 
 					}
 					
-//					if (!originZone.equals(destinationZone)) {
+					if (!originZone.equals(destinationZone)) {
 //					agents travelling from Berlin to Munich
-					if (originZone.equals("DE300") && destinationZone.equals("DE212") ) {
+//					if (originZone.equals("DE300") && destinationZone.equals("DE212") ) {
 						createPersons(sample, originZone, destinationZone, noOfAgents, mode, nextActType);
 					}
 					
