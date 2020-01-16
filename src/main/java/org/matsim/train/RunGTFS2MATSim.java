@@ -103,7 +103,7 @@ public class RunGTFS2MATSim {
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
 		
-//		runScenario(scenario);
+		runScenario(scenario);
 
 	}
 
@@ -285,6 +285,7 @@ public class RunGTFS2MATSim {
 							transitStopWithNewId = schedule.getFacilities().get(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class));
 						}
 						TransitRouteStop transitRouteStopWithNewId = tsf.createTransitRouteStop(transitStopWithNewId, stop.getArrivalOffset(), stop.getDepartureOffset());
+						transitRouteStopWithNewId.setAwaitDepartureTime(true);
 						stops.add(transitRouteStopWithNewId);
 					});
 					TransitRoute transitRouteWithNewId = tsf.createTransitRoute(Id.create(prefix + route.getId().toString(), TransitRoute.class), route.getRoute(), stops, route.getTransportMode());
