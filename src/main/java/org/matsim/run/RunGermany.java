@@ -86,7 +86,7 @@ public class RunGermany {
 	private static final String inputSchedulePlane =		inputDir + "transit_schedule_plane.xml";
 	private static final String inputVehiclesPlane =		inputDir + "transit_vehicles_plane.xml";
 	
-	private static final String inputPlans = 				inputDir + "populationTrainPlaneBERMUC5.0pct.xml";
+	private static final String inputPlans = 				inputDir + "populationTrainPlaneCarBERMUC100.0pct.xml";
 
 	private static final int noOfThreads = 8;
 	
@@ -96,7 +96,7 @@ public class RunGermany {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		config.controler().setLastIteration(20);
+		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setRunId(runid);
@@ -201,6 +201,7 @@ public class RunGermany {
 		config.addModule(srrConfig);
 		
 		ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
+//		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
 		
 		ModeParams scoreTrain = new ModeParams(TransportMode.train);
 		scoreTrain.setConstant(scorePt.getConstant());
