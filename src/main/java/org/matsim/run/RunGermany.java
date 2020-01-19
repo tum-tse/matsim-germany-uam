@@ -99,8 +99,8 @@ public class RunGermany {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		Config config = ConfigUtils.loadConfig(inputDir + "germanyConfig.xml");
 		
-		config.controler().setLastIteration(0);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(500);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		config.controler().setOutputDirectory(inputDir + "/Output");
 //		config.controler().setRunId(runid);
 
@@ -132,16 +132,20 @@ public class RunGermany {
 		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
 		
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-//		config.strategy().setMaxAgentPlanMemorySize(3);	
+		config.strategy().setMaxAgentPlanMemorySize(10);	
 		config.strategy().clearStrategySettings();
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
-		stratSetsReRoute.setWeight(0.1);
+		stratSetsReRoute.setWeight(0.05);
+		
+		StrategySettings stratSetsTimeAllocation = new StrategySettings();
+		stratSetsTimeAllocation.setStrategyName(DefaultStrategy.TimeAllocationMutator);
+		stratSetsTimeAllocation.setWeight(0.05);
 		
 		StrategySettings stratSetsChangeTripMode = new StrategySettings();
 		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
-		stratSetsChangeTripMode.setWeight(0.1);
+		stratSetsChangeTripMode.setWeight(0.05);
 		
 		String[] changeModes = new String[2];
 		changeModes[0] = "car";
@@ -150,9 +154,10 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
 		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
-		stratSetsChangeExpBeta.setWeight(0.8);
+		stratSetsChangeExpBeta.setWeight(0.85);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
+		config.strategy().addStrategySettings(stratSetsTimeAllocation);
 		config.strategy().addStrategySettings(stratSetsChangeExpBeta);
 		config.strategy().addStrategySettings(stratSetsChangeTripMode);
 		
@@ -203,8 +208,10 @@ public class RunGermany {
 		
 		config.addModule(srrConfig);
 		
+		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
+		scoreCar.setMonetaryDistanceRate(-0.0003);
+		
 		ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
-//		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
 		
 		ModeParams scoreTrain = new ModeParams(TransportMode.train);
 		scoreTrain.setConstant(scorePt.getConstant());
@@ -212,7 +219,7 @@ public class RunGermany {
 		scoreTrain.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
 		scoreTrain.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
 		scoreTrain.setMarginalUtilityOfTraveling(scorePt.getMarginalUtilityOfTraveling());
-		scoreTrain.setMonetaryDistanceRate(scorePt.getMonetaryDistanceRate());
+		scoreTrain.setMonetaryDistanceRate(-0.0001);
 		config.planCalcScore().addModeParams(scoreTrain);
 		
 		ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
@@ -222,7 +229,7 @@ public class RunGermany {
 		scoreAirplane.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
 		scoreAirplane.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
 		scoreAirplane.setMarginalUtilityOfTraveling(scorePt.getMarginalUtilityOfTraveling());
-		scoreAirplane.setMonetaryDistanceRate(scorePt.getMonetaryDistanceRate());
+		scoreAirplane.setMonetaryDistanceRate(-0.0001);
 		config.planCalcScore().addModeParams(scoreAirplane);
 		
 		ConfigUtils.applyCommandline( config, typedArgs ) ;
