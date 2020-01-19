@@ -21,6 +21,7 @@
 
 package org.matsim.run;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -95,6 +96,7 @@ public class RunGermany {
 	public static void main(String[] args) {
 		
 		String inputDir = args[0];
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		Config config = ConfigUtils.loadConfig(inputDir + "germanyConfig.xml");
 		
 		config.controler().setLastIteration(0);
@@ -223,6 +225,7 @@ public class RunGermany {
 		scoreAirplane.setMonetaryDistanceRate(scorePt.getMonetaryDistanceRate());
 		config.planCalcScore().addModeParams(scoreAirplane);
 		
+		ConfigUtils.applyCommandline( config, typedArgs ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		Network DBNetwork = NetworkUtils.readNetwork(inputDir + inputNetworkTrain);
