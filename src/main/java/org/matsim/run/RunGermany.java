@@ -78,9 +78,9 @@ public class RunGermany {
 	private static final String inputNetworkRoads = 		 "network_osm_secondary.xml.gz";
 
 	//	contains all db ice and ic services from 2016 from gtfs data
-	private static final String inputNetworkTrain =		 	 "network_train_gtfs.xml.gz";
-	private static final String inputScheduleTrain =		 "transit_schedule_train_gtfs.xml.gz";
-	private static final String inputVehiclesTrain =		 "transit_vehicles_train.xml.gz";
+	private static final String inputNetworkTrain =		 	 "network_train_gtfs_2019.xml.gz";
+	private static final String inputScheduleTrain =		 "transit_schedule_train_gtfs_2019.xml.gz";
+	private static final String inputVehiclesTrain =		 "transit_vehicles_train_2019.xml.gz";
 
 //	contains all german plane services from 09/09 from oag data
 	private static final String inputNetworkPlane = 		 "network_plane.xml";
@@ -209,8 +209,8 @@ public class RunGermany {
 		
 		config.addModule(srrConfig);
 		
-//		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
-//		scoreCar.setMonetaryDistanceRate(-0.0003);
+		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
+		scoreCar.setMonetaryDistanceRate(-0.0003);
 		
 		ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
 		
