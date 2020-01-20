@@ -139,9 +139,10 @@ public class RunGermany {
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
 		stratSetsReRoute.setWeight(0.05);
 		
-		StrategySettings stratSetsTimeAllocation = new StrategySettings();
-		stratSetsTimeAllocation.setStrategyName(DefaultStrategy.TimeAllocationMutator);
-		stratSetsTimeAllocation.setWeight(0.05);
+//		StrategySettings stratSetsTimeAllocation = new StrategySettings();
+//		stratSetsTimeAllocation.setStrategyName(DefaultStrategy.TimeAllocationMutator_ReRoute);
+//		stratSetsTimeAllocation.setWeight(0.05);
+//		config.timeAllocationMutator().setMutationRange(600.);
 		
 		StrategySettings stratSetsChangeTripMode = new StrategySettings();
 		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
@@ -154,10 +155,10 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
 		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
-		stratSetsChangeExpBeta.setWeight(0.85);
+		stratSetsChangeExpBeta.setWeight(0.9);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
-		config.strategy().addStrategySettings(stratSetsTimeAllocation);
+//		config.strategy().addStrategySettings(stratSetsTimeAllocation);
 		config.strategy().addStrategySettings(stratSetsChangeExpBeta);
 		config.strategy().addStrategySettings(stratSetsChangeTripMode);
 		
@@ -208,8 +209,8 @@ public class RunGermany {
 		
 		config.addModule(srrConfig);
 		
-		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
-		scoreCar.setMonetaryDistanceRate(-0.0003);
+//		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
+//		scoreCar.setMonetaryDistanceRate(-0.0003);
 		
 		ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
 		
@@ -223,8 +224,7 @@ public class RunGermany {
 		config.planCalcScore().addModeParams(scoreTrain);
 		
 		ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
-//		scoreAirplane.setConstant(scorePt.getConstant());
-		scoreAirplane.setConstant(-12.);
+		scoreAirplane.setConstant(scorePt.getConstant());
 		scoreAirplane.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
 		scoreAirplane.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
 		scoreAirplane.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
