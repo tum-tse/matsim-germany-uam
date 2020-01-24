@@ -23,6 +23,8 @@ package org.matsim.demand;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +66,7 @@ public class CreateDemand {
 
 	private static final Logger log = Logger.getLogger(CreateDemand.class);
 	
-	private final static Map<String, Geometry> regions = ShapeFileReader.getAllFeatures("../shared-svn/studies/countries/de/prognose_2030/Shape/NUTS3/NUTS3_2010_DE.shp").stream()
-			.collect(Collectors.toMap(feature -> (String) feature.getAttribute("NUTS_ID"), feature -> (Geometry) feature.getDefaultGeometry()));
+	private static Map<String, Geometry> regions;
 	
 	private static EnumeratedDistribution<Geometry> landcover;
 	
@@ -77,15 +78,17 @@ public class CreateDemand {
 //	private static final Random random = MatsimRandom.getLocalInstance();
 	
 	
-	public static Population create(String outputPopulationFile, double sample, boolean train, boolean car, boolean airplane, boolean pt, boolean bike, boolean walk) {
+	public static Population create(String outputPopulationFile, double sample, boolean train, boolean car, boolean airplane, boolean pt, boolean bike, boolean walk) throws MalformedURLException {
+		
+		regions = ShapeFileReader.getAllFeatures( new URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/original_data/shapes/NUTS3/NUTS3_2010_DE.shp")).stream()
+		.collect(Collectors.toMap(feature -> (String) feature.getAttribute("NUTS_ID"), feature -> (Geometry) feature.getDefaultGeometry()));
 		
 		population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-		
 		// Read in landcover data to make people stay in populated areas
 		// we are using a weighted distribution by area-size, so that small areas receive less inhabitants than more
 		// populated ones.
 		List<Pair<Geometry, Double>> weightedGeometries = new ArrayList<>();
-		for (SimpleFeature feature : ShapeFileReader.getAllFeatures("../shared-svn/studies/countries/de/prognose_2030/Shape/Landschaftsmodell/sie01_f.shp")) {
+		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(new URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/original_data/shapes/Landschaftsmodell/sie01_f.shp"))) {
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			weightedGeometries.add(new Pair<>(geometry, geometry.getArea()));
 		}
@@ -185,7 +188,8 @@ public class CreateDemand {
 						mode = "longDistancePt";
 						break;
 					case "OESPV":
-						mode = TransportMode.pt;
+//						mode = TransportMode.pt;
+						mode = "longDistancePt";
 						break;
 					case "Rad":
 						mode = TransportMode.bike;
@@ -218,9 +222,9 @@ public class CreateDemand {
 
 					}
 					
-					if (!originZone.equals(destinationZone)) {
-//					agents travelling from Berlin to Munich
-//					if (originZone.equals("DE300") && destinationZone.equals("DE212") ) {
+//					if (!originZone.equals(destinationZone)) {
+//					agents travelling from Berlin to Munich + Umland
+					if ((originZone.equals("DE300") || originZone.equals("DE40A") || originZone.equals("DE405") || originZone.equals("DE409") || originZone.equals("DE40C") || originZone.equals("DE406") || originZone.equals("DE40H") || originZone.equals("DE40E") || originZone.equals("DE404") || originZone.equals("DE408"))  && (destinationZone.equals("DE212") || destinationZone.equals("DE21H") || destinationZone.equals("DE21L") || destinationZone.equals("DE21C") || destinationZone.equals("DE217"))) {
 						createPersons(sample, originZone, destinationZone, noOfAgents, mode, nextActType);
 					}
 					

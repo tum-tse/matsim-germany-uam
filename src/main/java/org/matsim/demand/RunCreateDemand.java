@@ -21,6 +21,8 @@
 
 package org.matsim.demand;
 
+import java.net.MalformedURLException;
+
 import org.matsim.api.core.v01.population.Population;
 
 /**
@@ -32,18 +34,23 @@ public class RunCreateDemand {
 	public static void main(String[] args) {
 		
 		boolean train = true;
-		boolean car = false;
-		boolean airplane = false;
-		boolean pt = false;
+		boolean car = true;
+		boolean airplane = true;
+		boolean pt = true;
 		boolean bike = false;
 		boolean walk = false;
 		
-		double sample = 0.5;
+		double sample = 0.1;
 		
-		String outputPopulationFile = "populationTrain" + 100 * sample + "pct.xml";
+		String outputPopulationFile = "output/test" + 100 * sample + "pct.xml";
 		
 		
-		Population population = CreateDemand.create(outputPopulationFile, sample, train, car, airplane, pt, bike, walk);
+		try {
+			Population population = CreateDemand.create(outputPopulationFile, sample, train, car, airplane, pt, bike, walk);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
