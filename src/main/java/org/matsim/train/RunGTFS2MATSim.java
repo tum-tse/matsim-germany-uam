@@ -25,11 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -39,10 +36,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -66,61 +59,47 @@ public class RunGTFS2MATSim {
 	
 	private static final Logger log = Logger.getLogger(RunGTFS2MATSim.class);
 	private static final String svnDir = "../";
-	private static final String DBGTFSFile = svnDir + "shared-svn/studies/countries/de/train/db-fv-gtfs-master/2019.zip";
-	private static final String VRRGTFSFile = svnDir + "shared-svn/projects/nemo_mercator/data/pt/vrr_gtfs_sep19.zip";
-	private static final String outputDir = svnDir + "shared-svn/studies/countries/de/train/db-fv-gtfs-master/MATSimFiles/2016/";
-	
-//	private static final List<Geometry> regions = ShapeFileReader.getAllFeatures("../shared-svn/projects/nemo_mercator/data/matsim_input/baseCase/ruhrgebiet_boundary.shp").stream() 
-//			.map(feature -> (Geometry)feature.getDefaultGeometry())
-//			.collect(Collectors.toList());
-	private final static Map<String, Geometry> regions = ShapeFileReader.getAllFeatures(svnDir + "shared-svn/projects/nemo_mercator/data/original_files/shapeFiles/shapeFile_Bundeslaender/vg2500_geo84/vg2500_bld.shp").stream()
-			.collect(Collectors.toMap(feature -> (String) feature.getAttribute("GEN"), feature -> (Geometry) feature.getDefaultGeometry()));
-	
-	private static final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31467", TransformationFactory.WGS84);
-	
+//	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2019.zip";
+	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2016.zip";
+
+		
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2019-11-23", "DB_");
-		Scenario VRRScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(VRRGTFSFile, "2019-11-23", "VRR_");
+//		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2019-11-23", "DB_");
+		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2016-11-24", "DB_");
 		
 		mergeSchedules("DB_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), DBScenario.getTransitSchedule());
 		mergeVehicles("DB_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), DBScenario.getTransitVehicles());
-		
-		mergeSchedules("VRR_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), VRRScenario.getTransitSchedule());
-		mergeVehicles("VRR_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), VRRScenario.getTransitVehicles());
 	
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "").createNetwork();
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "DB_").createNetwork();
 		
 //		sets link speeds to the maximum speed of all train trips that travel on this link
 //		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
 		
-		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_transitVehicles.xml.gz");
-		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_transitSchedule.xml.gz");
-		new NetworkWriter(scenario.getNetwork()).write(svnDir + "shared-svn/projects/nemo_mercator/data/pt/DB_VRR_GTFS_merged/DB_VRR_GTFS_network.xml.gz");
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitVehicles.xml.gz");
+		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitSchedule.xml.gz");
+		new NetworkWriter(scenario.getNetwork()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_network.xml.gz");
 		
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
 		
-		runScenario(scenario);
+//		runScenario(scenario);
 
 	}
 
-//	private static Scenario createScenario(String gtfsZipFile, String date, String networkPrefix) {
-//		Scenario scenario = new CreatePtScheduleAndVehiclesFromGtfs().run(gtfsZipFile, date, networkPrefix);
-//		return scenario;
-//	}
 	
 	private static void runScenario(Scenario scenario) {
 		
 		Config config = scenario.getConfig();
 		
-		config.controler().setOutputDirectory(outputDir+"/Run");
+		config.controler().setOutputDirectory("output/");
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.global().setNumberOfThreads(8);
+		config.controler().setRunId("test_GTFS_Schedule");
 		
 		config.transit().setUseTransit(true);
 		
@@ -271,7 +250,6 @@ public class RunGTFS2MATSim {
 	private static void mergeSchedules(String prefix, TransitScheduleFactory tsf, TransitSchedule schedule, TransitSchedule toBeMerged) {
 		 toBeMerged.getTransitLines().values().forEach(transitLine -> {
 			TransitLine transitLineWithNewId = tsf.createTransitLine(Id.create(prefix + transitLine.getId().toString(), TransitLine.class));
-			if (checkIfLineIsInShape(transitLine)) {
 				transitLine.getRoutes().values().forEach(route -> {
 					List<TransitRouteStop> stops = new ArrayList<>();
 					route.getStops().forEach(stop -> {
@@ -298,7 +276,6 @@ public class RunGTFS2MATSim {
 				});
 			transitLineWithNewId.setName(transitLine.getName());
 			schedule.addTransitLine(transitLineWithNewId);
-			}
 		});
 	}
 
@@ -316,26 +293,6 @@ public class RunGTFS2MATSim {
 			vehicles.addVehicle(vehicleWithNewId);
 		});
 
-	}
-	
-	private static boolean checkIfLineIsInShape(TransitLine line) {
-
-		boolean lineIsInShape = false;
-		for (TransitRoute route : line.getRoutes().values()) {
-			for (TransitRouteStop routeStop : route.getStops()) {
-				Coord coord = ct.transform(routeStop.getStopFacility().getCoord());
-				Geometry ageometry = regions.get("Nordrhein-Westfalen");
-				if (isInGeometry(coord,  ageometry)) {
-					lineIsInShape = true;
-				}
-			}
-		}
-		return lineIsInShape;
-	}
-	
-	private static boolean isInGeometry(Coord coord, Geometry geometry) {
-		return geometry.contains(MGC.coord2Point(coord));
-//		return geometries.stream().anyMatch(geometry -> geometry.contains(MGC.coord2Point(coord)));
 	}
 	
 
