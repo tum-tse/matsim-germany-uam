@@ -78,9 +78,14 @@ public class RunGermany {
 	private static final String inputNetworkRoads = 		 "network_osm_secondary.xml.gz";
 
 	//	contains all db ice and ic services from 2016 from gtfs data
-	private static final String inputNetworkTrain =		 	 "network_train_gtfs.xml.gz";
-	private static final String inputScheduleTrain =		 "transit_schedule_train_gtfs.xml.gz";
-	private static final String inputVehiclesTrain =		 "transit_vehicles_train.xml.gz";
+	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_network.xml.gz";
+	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitSchedule.xml.gz";
+	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitVehicles.xml.gz";
+	
+	//	contains all db ice and ic services from 2019 from gtfs data
+//	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_network.xml.gz";
+//	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitSchedule.xml.gz";
+//	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitVehicles.xml.gz";
 
 //	contains all german plane services from 09/09 from oag data
 	private static final String inputNetworkPlane = 		 "network_plane.xml";
@@ -235,15 +240,15 @@ public class RunGermany {
 		ConfigUtils.applyCommandline( config, typedArgs ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-		Network DBNetwork = NetworkUtils.readNetwork(inputDir + inputNetworkTrain);
+		Network DBNetwork = NetworkUtils.readNetwork(inputNetworkTrain);
 		Set<String> trainModes = new HashSet<>();
 		trainModes.add(TransportMode.train);
 		DBNetwork.getLinks().values().forEach(l -> l.setAllowedModes(trainModes));
 		MergeNetworks.merge(scenario.getNetwork(),"", DBNetwork);
 		
 		Config trainConfig = ConfigUtils.createConfig();
-		trainConfig.transit().setTransitScheduleFile(inputDir + inputScheduleTrain);
-		trainConfig.transit().setVehiclesFile(inputDir + inputVehiclesTrain);
+		trainConfig.transit().setTransitScheduleFile(inputScheduleTrain);
+		trainConfig.transit().setVehiclesFile(inputVehiclesTrain);
 		Scenario trainScenario = ScenarioUtils.loadScenario(trainConfig);
 		trainScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
 		trainScenario.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "trainStation"));
