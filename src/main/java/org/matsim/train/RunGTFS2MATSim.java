@@ -61,26 +61,42 @@ public class RunGTFS2MATSim {
 	private static final String svnDir = "../";
 //	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2019.zip";
 	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2016.zip";
+	private static final String FernGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Fernverkehr.zip";
+	private static final String RegioGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Regionalverkehr.zip";
+	private static final String NahGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Nahverkehr_corr.zip";
 
 		
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2019-11-23", "DB_");
-		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2016-11-24", "DB_");
+//		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2016-11-24", "DB_");
 		
-		mergeSchedules("DB_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), DBScenario.getTransitSchedule());
-		mergeVehicles("DB_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), DBScenario.getTransitVehicles());
+		Scenario FernScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(FernGTFSFile, "2020-02-11", "Fern_");
+		
+		mergeSchedules("Fern_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), FernScenario.getTransitSchedule());
+		mergeVehicles("Fern_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), FernScenario.getTransitVehicles());
+		
+		Scenario RegioScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(RegioGTFSFile, "2020-02-11", "Regio_");
+		
+		mergeSchedules("Regio_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), RegioScenario.getTransitSchedule());
+		mergeVehicles("Regio_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), RegioScenario.getTransitVehicles());
+		
+		Scenario NahScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(NahGTFSFile, "2020-02-11", "Nah_");
+		
+		mergeSchedules("Nah_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), NahScenario.getTransitSchedule());
+		mergeVehicles("Nah_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), NahScenario.getTransitVehicles());
 	
-		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "DB_").createNetwork();
+		
+		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "Train_").createNetwork();
 		
 //		sets link speeds to the maximum speed of all train trips that travel on this link
 //		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
 		
-		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitVehicles.xml.gz");
-		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitSchedule.xml.gz");
-		new NetworkWriter(scenario.getNetwork()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_network.xml.gz");
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles.xml.gz");
+		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule.xml.gz");
+		new NetworkWriter(scenario.getNetwork()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network.xml.gz");
 		
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
@@ -90,7 +106,7 @@ public class RunGTFS2MATSim {
 	}
 
 	
-	private static void runScenario(Scenario scenario) {
+	 static void runScenario(Scenario scenario) {
 		
 		Config config = scenario.getConfig();
 		
@@ -100,6 +116,7 @@ public class RunGTFS2MATSim {
 		
 		config.global().setNumberOfThreads(8);
 		config.controler().setRunId("test_GTFS_Schedule");
+//		config.qsim().setEndTime(48*3600);
 		
 		config.transit().setUseTransit(true);
 		
@@ -180,7 +197,7 @@ public class RunGTFS2MATSim {
 		
 	}
 	
-	private static void setLinkSpeedsToMax(Scenario scenario) {
+	static void setLinkSpeedsToMax(Scenario scenario) {
 		Map<Id<Link>, Double> linkMaxSpeed = new HashMap<>();
 		
 		
