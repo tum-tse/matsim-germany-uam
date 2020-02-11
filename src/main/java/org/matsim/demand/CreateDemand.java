@@ -222,9 +222,12 @@ public class CreateDemand {
 
 					}
 					
-//					if (!originZone.equals(destinationZone)) {
+					if (!originZone.equals(destinationZone)) {
 //					agents travelling from Berlin to Munich + Umland
-					if ((originZone.equals("DE300") || originZone.equals("DE40A") || originZone.equals("DE405") || originZone.equals("DE409") || originZone.equals("DE40C") || originZone.equals("DE406") || originZone.equals("DE40H") || originZone.equals("DE40E") || originZone.equals("DE404") || originZone.equals("DE408"))  && (destinationZone.equals("DE212") || destinationZone.equals("DE21H") || destinationZone.equals("DE21L") || destinationZone.equals("DE21C") || destinationZone.equals("DE217"))) {
+//					if(originZone.equals("DE300") && destinationZone.equals("DEA23")) {
+//					if ((originZone.equals("DE300") || originZone.equals("DE40A") || originZone.equals("DE405") || originZone.equals("DE409") || originZone.equals("DE40C") || originZone.equals("DE406") || originZone.equals("DE40H") || originZone.equals("DE40E") || originZone.equals("DE404") || originZone.equals("DE408"))  && (destinationZone.equals("DEA23") || destinationZone.equals("DEA27") || destinationZone.equals("DEA1D") || destinationZone.equals("DEA1C") || destinationZone.equals("DEA24") || destinationZone.equals("DEA2B") || destinationZone.equals("DEA2C"))) {
+
+//					if ((originZone.equals("DE300") || originZone.equals("DE40A") || originZone.equals("DE405") || originZone.equals("DE409") || originZone.equals("DE40C") || originZone.equals("DE406") || originZone.equals("DE40H") || originZone.equals("DE40E") || originZone.equals("DE404") || originZone.equals("DE408"))  && (destinationZone.equals("DE212") || destinationZone.equals("DE21H") || destinationZone.equals("DE21L") || destinationZone.equals("DE21C") || destinationZone.equals("DE217"))) {
 						createPersons(sample, originZone, destinationZone, noOfAgents, mode, nextActType);
 					}
 					
