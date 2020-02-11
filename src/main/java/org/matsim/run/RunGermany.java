@@ -78,21 +78,34 @@ public class RunGermany {
 	private static final String inputNetworkRoads = 		 "network_osm_secondary.xml.gz";
 
 	//	contains all db ice and ic services from 2016 from gtfs data
-	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_network.xml.gz";
-	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitSchedule.xml.gz";
-	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitVehicles.xml.gz";
+//	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_network.xml.gz";
+//	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitSchedule.xml.gz";
+//	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2016_DB_GTFS_transitVehicles.xml.gz";
 	
 	//	contains all db ice and ic services from 2019 from gtfs data
 //	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_network.xml.gz";
 //	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitSchedule.xml.gz";
 //	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitVehicles.xml.gz";
+	
+//	contains 2020 train data from gtfs.de
+	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network.xml.gz";
+	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule.xml.gz";
+	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles.xml.gz";
+	
+//	private static final String inputNetworkTrain_2030 =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_network.xml.gz";
+//	private static final String inputScheduleTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitSchedule.xml.gz";
+//	private static final String inputVehiclesTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitVehicles.xml.gz";
 
 //	contains all german plane services from 09/09 from oag data
 	private static final String inputNetworkPlane = 		 "network_plane.xml";
 	private static final String inputSchedulePlane =		 "transit_schedule_plane.xml";
 	private static final String inputVehiclesPlane =		 "transit_vehicles_plane.xml";
 	
-	private static final String inputPlans = 				 "populationTrainPlaneCarBERMUC100.0pct.xml";
+	private static final String inputPlans = 				 "germany_0.1pct.xml";
+	
+	private static final String longDistanceTrain = "longDistanceTrain";
+	private static final String regionalTrain = "regionalTrain";
+	private static final String localPublicTransport = "localPublicTransport";
 
 	private static final int noOfThreads = 8;
 	
@@ -182,10 +195,25 @@ public class RunGermany {
 		SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
 		srrConfig.setUseModeMappingForPassengers(true);
 		
-		ModeMappingForPassengersParameterSet modeMappingTrain = new ModeMappingForPassengersParameterSet();
-		modeMappingTrain.setPassengerMode(TransportMode.train);
-		modeMappingTrain.setRouteMode(TransportMode.train);
-		srrConfig.addModeMappingForPassengers(modeMappingTrain);
+//		ModeMappingForPassengersParameterSet modeMappingTrain = new ModeMappingForPassengersParameterSet();
+//		modeMappingTrain.setPassengerMode(TransportMode.train);
+//		modeMappingTrain.setRouteMode(TransportMode.train);
+//		srrConfig.addModeMappingForPassengers(modeMappingTrain);
+		
+		ModeMappingForPassengersParameterSet modeMappingLongDistanceTrain = new ModeMappingForPassengersParameterSet();
+		modeMappingLongDistanceTrain.setPassengerMode(longDistanceTrain);
+		modeMappingLongDistanceTrain.setRouteMode(longDistanceTrain);
+		srrConfig.addModeMappingForPassengers(modeMappingLongDistanceTrain);
+		
+		ModeMappingForPassengersParameterSet modeMappingRegionalTrain = new ModeMappingForPassengersParameterSet();
+		modeMappingRegionalTrain.setPassengerMode(regionalTrain);
+		modeMappingRegionalTrain.setRouteMode(regionalTrain);
+		srrConfig.addModeMappingForPassengers(modeMappingRegionalTrain);
+		
+		ModeMappingForPassengersParameterSet modeMappingTrainLocalPublicTransport = new ModeMappingForPassengersParameterSet();
+		modeMappingTrainLocalPublicTransport.setPassengerMode(localPublicTransport);
+		modeMappingTrainLocalPublicTransport.setRouteMode(localPublicTransport);
+		srrConfig.addModeMappingForPassengers(modeMappingTrainLocalPublicTransport);
 		
 		ModeMappingForPassengersParameterSet modeMappingAirplane = new ModeMappingForPassengersParameterSet();
 		modeMappingAirplane.setPassengerMode(TransportMode.airplane);
@@ -203,57 +231,137 @@ public class RunGermany {
 		intermodalAccessEgressParameterSetAirportWithCar.setStopFilterValue("airport");
 		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetAirportWithCar);
 		
-		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetTrainStationWithCar = new IntermodalAccessEgressParameterSet();
-		intermodalAccessEgressParameterSetTrainStationWithCar.setMode("car");
-		intermodalAccessEgressParameterSetTrainStationWithCar.setMaxRadius(100 * 1000);
-		intermodalAccessEgressParameterSetTrainStationWithCar.setInitialSearchRadius(20 * 1000);
-		intermodalAccessEgressParameterSetTrainStationWithCar.setSearchExtensionRadius(20 * 1000);
-		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterAttribute("type");
-		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
-		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
+//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setMode("car");
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setMaxRadius(100 * 1000);
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setInitialSearchRadius(20 * 1000);
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setSearchExtensionRadius(20 * 1000);
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterAttribute("type");
+//		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
+//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
+		
+		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
+		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
+//		
+//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLocalTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setMode("car");
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setMaxRadius(20 * 1000);
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setInitialSearchRadius(5 * 1000);
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setSearchExtensionRadius(5 * 1000);
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setStopFilterAttribute("type");
+//		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setStopFilterValue("regionalTrain");
+//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLocalTrainStationWithCar);
+		
+//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLocalPublicTransportWithCar = new IntermodalAccessEgressParameterSet();
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setMode("car");
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setMaxRadius(10 * 1000);
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setInitialSearchRadius(2 * 1000);
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setSearchExtensionRadius(2 * 1000);
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setStopFilterAttribute("type");
+//		intermodalAccessEgressParameterSetLocalPublicTransportWithCar.setStopFilterValue("localPublicTransport");
+//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLocalPublicTransportWithCar);
+		
+		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetWalk = new IntermodalAccessEgressParameterSet();
+		intermodalAccessEgressParameterSetWalk.setMode("walk");
+		intermodalAccessEgressParameterSetWalk.setMaxRadius(5 * 1000);
+		intermodalAccessEgressParameterSetWalk.setInitialSearchRadius(1 * 1000);
+		intermodalAccessEgressParameterSetWalk.setSearchExtensionRadius(1 * 1000);
+		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetWalk);
 		
 		config.addModule(srrConfig);
 		
 		ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
-		scoreCar.setMonetaryDistanceRate(-0.0003);
+		scoreCar.setMonetaryDistanceRate(-0.0001);
+		scoreCar.setMarginalUtilityOfTraveling(-6);
 		
 		ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
 		
-		ModeParams scoreTrain = new ModeParams(TransportMode.train);
-		scoreTrain.setConstant(scorePt.getConstant());
-		scoreTrain.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
-		scoreTrain.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
-		scoreTrain.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
-		scoreTrain.setMarginalUtilityOfTraveling(scorePt.getMarginalUtilityOfTraveling());
-		scoreTrain.setMonetaryDistanceRate(-0.0001);
-		config.planCalcScore().addModeParams(scoreTrain);
+//		ModeParams scoreTrain = new ModeParams(TransportMode.train);
+//		scoreTrain.setConstant(scorePt.getConstant());
+//		scoreTrain.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
+//		scoreTrain.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
+//		scoreTrain.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
+//		scoreTrain.setMarginalUtilityOfTraveling(scorePt.getMarginalUtilityOfTraveling());
+//		scoreTrain.setMonetaryDistanceRate(-0.0001);
+//		config.planCalcScore().addModeParams(scoreTrain);
+		
+		ModeParams scoreLongDistanceTrain = new ModeParams(longDistanceTrain);
+		scoreLongDistanceTrain.setConstant(-6);
+		scoreLongDistanceTrain.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
+		scoreLongDistanceTrain.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
+		scoreLongDistanceTrain.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
+		scoreLongDistanceTrain.setMarginalUtilityOfTraveling(-3);
+		scoreLongDistanceTrain.setMonetaryDistanceRate(-0.0001);
+		config.planCalcScore().addModeParams(scoreLongDistanceTrain);
+		
+		ModeParams scoreRegionalTrain = new ModeParams(regionalTrain);
+		scoreRegionalTrain.setConstant(scorePt.getConstant());
+		scoreRegionalTrain.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
+		scoreRegionalTrain.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
+		scoreRegionalTrain.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
+		scoreRegionalTrain.setMarginalUtilityOfTraveling(-3);
+		scoreRegionalTrain.setMonetaryDistanceRate(-0.0001);
+		config.planCalcScore().addModeParams(scoreRegionalTrain);
+		
+		ModeParams scoreLocalPublicTransport = new ModeParams(localPublicTransport);
+		scoreLocalPublicTransport.setConstant(scorePt.getConstant());
+		scoreLocalPublicTransport.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
+		scoreLocalPublicTransport.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
+		scoreLocalPublicTransport.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
+		scoreLocalPublicTransport.setMarginalUtilityOfTraveling(-3);
+		scoreLocalPublicTransport.setMonetaryDistanceRate(0);
+		config.planCalcScore().addModeParams(scoreLocalPublicTransport);
 		
 		ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
-		scoreAirplane.setConstant(scorePt.getConstant());
+		scoreAirplane.setConstant(-15);
 		scoreAirplane.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
 		scoreAirplane.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
 		scoreAirplane.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
-		scoreAirplane.setMarginalUtilityOfTraveling(scorePt.getMarginalUtilityOfTraveling());
+		scoreAirplane.setMarginalUtilityOfTraveling(-6);
 		scoreAirplane.setMonetaryDistanceRate(-0.0001);
 		config.planCalcScore().addModeParams(scoreAirplane);
 		
 		ConfigUtils.applyCommandline( config, typedArgs ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-		Network DBNetwork = NetworkUtils.readNetwork(inputNetworkTrain);
+		Network trainNetwork = NetworkUtils.readNetwork(inputNetworkTrain);
 		Set<String> trainModes = new HashSet<>();
 		trainModes.add(TransportMode.train);
-		DBNetwork.getLinks().values().forEach(l -> l.setAllowedModes(trainModes));
-		MergeNetworks.merge(scenario.getNetwork(),"", DBNetwork);
+		trainModes.add(longDistanceTrain);
+		trainModes.add(regionalTrain);
+		trainModes.add(localPublicTransport);
+		trainNetwork.getLinks().values().forEach(l -> l.setAllowedModes(trainModes));
+		MergeNetworks.merge(scenario.getNetwork(),"", trainNetwork);
 		
 		Config trainConfig = ConfigUtils.createConfig();
 		trainConfig.transit().setTransitScheduleFile(inputScheduleTrain);
 		trainConfig.transit().setVehiclesFile(inputVehiclesTrain);
 		Scenario trainScenario = ScenarioUtils.loadScenario(trainConfig);
-		trainScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
-		trainScenario.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "trainStation"));
+//		trainScenario.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
+//		trainScenario.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "trainStation"));
 		mergeSchedules(scenario.getTransitSchedule(), trainScenario.getTransitSchedule());
 		mergeVehicles(scenario.getTransitVehicles(), trainScenario.getTransitVehicles());
+		
+//		Network DBNetwork_2030 = NetworkUtils.readNetwork(inputNetworkTrain_2030);
+//		Set<String> trainModes_2030 = new HashSet<>();
+//		trainModes_2030.add(TransportMode.train);
+//		DBNetwork_2030.getLinks().values().forEach(l -> l.setAllowedModes(trainModes_2030));
+//		MergeNetworks.merge(scenario.getNetwork(),"", DBNetwork_2030);
+//		
+//		Config trainConfig_2030 = ConfigUtils.createConfig();
+//		trainConfig_2030.transit().setTransitScheduleFile(inputScheduleTrain_2030);
+//		trainConfig_2030.transit().setVehiclesFile(inputVehiclesTrain_2030);
+//		Scenario trainScenario_2030 = ScenarioUtils.loadScenario(trainConfig_2030);
+//		trainScenario_2030.getTransitSchedule().getTransitLines().values().forEach(line -> line.getRoutes().values().forEach(route -> route.setTransportMode(TransportMode.train)));
+//		trainScenario_2030.getTransitSchedule().getFacilities().values().forEach(stop -> TransitScheduleUtils.putStopFacilityAttribute(stop, "type", "trainStation"));
+//		mergeSchedules(scenario.getTransitSchedule(), trainScenario_2030.getTransitSchedule());
+//		mergeVehicles(scenario.getTransitVehicles(), trainScenario_2030.getTransitVehicles());
 		
 		Network airplaneNetwork = NetworkUtils.readNetwork(inputDir + inputNetworkPlane);
 		Set<String> airplaneModes = new HashSet<>();
@@ -281,7 +389,7 @@ public class RunGermany {
 				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
-		
+		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
 		controler.run();
 
 	}
