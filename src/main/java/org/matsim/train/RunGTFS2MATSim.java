@@ -36,6 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV2;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -74,17 +75,17 @@ public class RunGTFS2MATSim {
 		
 		Scenario FernScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(FernGTFSFile, "2020-02-11", "Fern_");
 		
-		mergeSchedules("Fern_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), FernScenario.getTransitSchedule());
+		mergeSchedules("Fern_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), FernScenario.getTransitSchedule(), "longDistanceTrain");
 		mergeVehicles("Fern_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), FernScenario.getTransitVehicles());
 		
 		Scenario RegioScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(RegioGTFSFile, "2020-02-11", "Regio_");
 		
-		mergeSchedules("Regio_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), RegioScenario.getTransitSchedule());
+		mergeSchedules("Regio_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), RegioScenario.getTransitSchedule(), "regionalTrain");
 		mergeVehicles("Regio_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), RegioScenario.getTransitVehicles());
 		
 		Scenario NahScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(NahGTFSFile, "2020-02-11", "Nah_");
 		
-		mergeSchedules("Nah_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), NahScenario.getTransitSchedule());
+		mergeSchedules("Nah_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), NahScenario.getTransitSchedule(), "localPublicTransport");
 		mergeVehicles("Nah_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), NahScenario.getTransitVehicles());
 	
 		
@@ -264,7 +265,7 @@ public class RunGTFS2MATSim {
 		
 	}
 	
-	private static void mergeSchedules(String prefix, TransitScheduleFactory tsf, TransitSchedule schedule, TransitSchedule toBeMerged) {
+	private static void mergeSchedules(String prefix, TransitScheduleFactory tsf, TransitSchedule schedule, TransitSchedule toBeMerged, String mode) {
 		 toBeMerged.getTransitLines().values().forEach(transitLine -> {
 			TransitLine transitLineWithNewId = tsf.createTransitLine(Id.create(prefix + transitLine.getId().toString(), TransitLine.class));
 				transitLine.getRoutes().values().forEach(route -> {
@@ -274,6 +275,7 @@ public class RunGTFS2MATSim {
 						if (!schedule.getFacilities().containsKey(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class))) {
 							transitStopWithNewId = tsf.createTransitStopFacility(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class), stop.getStopFacility().getCoord(), stop.getStopFacility().getIsBlockingLane());
 							transitStopWithNewId.setName(stop.getStopFacility().getName());
+							TransitScheduleUtils.putStopFacilityAttribute(transitStopWithNewId, "type", mode);
 							schedule.addStopFacility(transitStopWithNewId);
 						}
 						else {
@@ -283,7 +285,7 @@ public class RunGTFS2MATSim {
 						transitRouteStopWithNewId.setAwaitDepartureTime(true);
 						stops.add(transitRouteStopWithNewId);
 					});
-					TransitRoute transitRouteWithNewId = tsf.createTransitRoute(Id.create(prefix + route.getId().toString(), TransitRoute.class), route.getRoute(), stops, route.getTransportMode());
+					TransitRoute transitRouteWithNewId = tsf.createTransitRoute(Id.create(prefix + route.getId().toString(), TransitRoute.class), route.getRoute(), stops, mode);
 					transitLineWithNewId.addRoute(transitRouteWithNewId);	
 					route.getDepartures().values().forEach(dep -> {
 						Departure departureWithNewId = tsf.createDeparture(Id.create(prefix + dep.getId().toString(), Departure.class), dep.getDepartureTime());
