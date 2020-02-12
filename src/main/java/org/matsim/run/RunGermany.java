@@ -94,6 +94,10 @@ public class RunGermany {
 	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule.xml.gz";
 	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles.xml.gz";
 	
+//	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network_noLocal.xml.gz";
+//	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule_noLocal.xml.gz";
+//	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles_noLocal.xml.gz";
+	
 //	private static final String inputNetworkTrain_2030 =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_network.xml.gz";
 //	private static final String inputScheduleTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitSchedule.xml.gz";
 //	private static final String inputVehiclesTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitVehicles.xml.gz";
@@ -103,7 +107,7 @@ public class RunGermany {
 	private static final String inputSchedulePlane =		 "transit_schedule_plane.xml";
 	private static final String inputVehiclesPlane =		 "transit_vehicles_plane.xml";
 	
-	private static final String inputPlans = 				 "germany_0.1pct.xml";
+	private static final String inputPlans = 				 "germany_0.01pct.xml";
 	
 	private static final String longDistanceTrain = "longDistanceTrain";
 	private static final String regionalTrain = "regionalTrain";
@@ -119,7 +123,7 @@ public class RunGermany {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		Config config = ConfigUtils.loadConfig(inputDir + "germanyConfig.xml");
 		
-		config.controler().setLastIteration(500);
+		config.controler().setLastIteration(200);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		config.controler().setOutputDirectory(inputDir + "/Output");
 //		config.controler().setRunId(runid);
@@ -157,7 +161,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
-		stratSetsReRoute.setWeight(0.05);
+		stratSetsReRoute.setWeight(0.1);
 		
 //		StrategySettings stratSetsTimeAllocation = new StrategySettings();
 //		stratSetsTimeAllocation.setStrategyName(DefaultStrategy.TimeAllocationMutator_ReRoute);
@@ -166,7 +170,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeTripMode = new StrategySettings();
 		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
-		stratSetsChangeTripMode.setWeight(0.05);
+		stratSetsChangeTripMode.setWeight(0.1);
 		
 		String[] changeModes = new String[2];
 		changeModes[0] = "car";
@@ -175,7 +179,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
 		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
-		stratSetsChangeExpBeta.setWeight(0.9);
+		stratSetsChangeExpBeta.setWeight(0.8);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
 //		config.strategy().addStrategySettings(stratSetsTimeAllocation);
@@ -243,14 +247,14 @@ public class RunGermany {
 //		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
 //		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
 		
-		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
-		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
+//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
+//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
 //		
 //		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLocalTrainStationWithCar = new IntermodalAccessEgressParameterSet();
 //		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setMode("car");
