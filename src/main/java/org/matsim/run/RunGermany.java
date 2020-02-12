@@ -247,14 +247,14 @@ public class RunGermany {
 //		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
 //		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
 		
-		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
-		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
-		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
+//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
+//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
+//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
 //		
 //		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLocalTrainStationWithCar = new IntermodalAccessEgressParameterSet();
 //		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setMode("car");
