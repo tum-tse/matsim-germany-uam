@@ -98,20 +98,20 @@ public class RunGermany {
 //	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule_noLocal.xml.gz";
 //	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles_noLocal.xml.gz";
 	
-//	private static final String inputNetworkTrain_2030 =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_network.xml.gz";
+//	private static final String inputNetworkTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_network.xml.gz";
 //	private static final String inputScheduleTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitSchedule.xml.gz";
 //	private static final String inputVehiclesTrain_2030 =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2030_transitVehicles.xml.gz";
 
 //	contains all german plane services from 09/09 from oag data
-	private static final String inputNetworkPlane = 		 "network_plane.xml";
-	private static final String inputSchedulePlane =		 "transit_schedule_plane.xml";
-	private static final String inputVehiclesPlane =		 "transit_vehicles_plane.xml";
+	private static final String inputNetworkPlane = 		"network_plane.xml";
+	private static final String inputSchedulePlane =		"transit_schedule_plane.xml";
+	private static final String inputVehiclesPlane =		"transit_vehicles_plane.xml";
 	
-	private static final String inputPlans = 				 "germany_0.01pct.xml";
+	private static final String inputPlans =				"germany_0.1pct.xml";
 	
-	private static final String longDistanceTrain = "longDistanceTrain";
-	private static final String regionalTrain = "regionalTrain";
-	private static final String localPublicTransport = "localPublicTransport";
+	private static final String longDistanceTrain = 		"longDistanceTrain";
+	private static final String regionalTrain = 			"regionalTrain";
+	private static final String localPublicTransport = 		"localPublicTransport";
 
 	private static final int noOfThreads = 8;
 	
@@ -231,9 +231,9 @@ public class RunGermany {
 		
 		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetAirportWithCar = new IntermodalAccessEgressParameterSet();
 		intermodalAccessEgressParameterSetAirportWithCar.setMode("car");
-		intermodalAccessEgressParameterSetAirportWithCar.setMaxRadius(500 * 1000);
-		intermodalAccessEgressParameterSetAirportWithCar.setInitialSearchRadius(125 * 1000);
-		intermodalAccessEgressParameterSetAirportWithCar.setSearchExtensionRadius(125 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setMaxRadius(200 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setInitialSearchRadius(50 * 1000);
+		intermodalAccessEgressParameterSetAirportWithCar.setSearchExtensionRadius(50 * 1000);
 		intermodalAccessEgressParameterSetAirportWithCar.setStopFilterAttribute("type");
 		intermodalAccessEgressParameterSetAirportWithCar.setStopFilterValue("airport");
 		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetAirportWithCar);
@@ -247,14 +247,14 @@ public class RunGermany {
 //		intermodalAccessEgressParameterSetTrainStationWithCar.setStopFilterValue("trainStation");
 //		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetTrainStationWithCar);
 		
-//		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
-//		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
-//		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
+		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar = new IntermodalAccessEgressParameterSet();
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMode("car");
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setMaxRadius(50 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setInitialSearchRadius(10 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setSearchExtensionRadius(10 * 1000);
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterAttribute("type");
+		intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar.setStopFilterValue("longDistanceTrain");
+		srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetLongDistanceTrainStationWithCar);
 //		
 //		IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetLocalTrainStationWithCar = new IntermodalAccessEgressParameterSet();
 //		intermodalAccessEgressParameterSetLocalTrainStationWithCar.setMode("car");
@@ -396,11 +396,11 @@ public class RunGermany {
 				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
-		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
-		
-		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
-		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml");
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml");
+//		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
+//		
+//		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
+//		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml");
+//		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml");
 		
 		controler.run();
 
