@@ -53,6 +53,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
@@ -185,6 +187,7 @@ public class RunGermany {
 		config.plans().setInputFile(inputPlans);
 		
 		config.transit().setUseTransit(true);
+		config.transitRouter().setMaxBeelineWalkConnectionDistance(300);
 		
 		Set<String> transitModes = new HashSet<>();
 //		transitModes.add(TransportMode.train);
@@ -390,6 +393,11 @@ public class RunGermany {
 			}
 		} );
 		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
+		
+		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml");
+		
 		controler.run();
 
 	}
