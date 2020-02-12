@@ -61,7 +61,7 @@ public class RunGTFS2MATSim {
 	private static final Logger log = Logger.getLogger(RunGTFS2MATSim.class);
 	private static final String svnDir = "../";
 //	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2019.zip";
-	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2016.zip";
+//	private static final String DBGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs/2016.zip";
 	private static final String FernGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Fernverkehr.zip";
 	private static final String RegioGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Regionalverkehr.zip";
 	private static final String NahGTFSFile = svnDir + "public-svn/matsim/scenarios/countries/de/germany/original_data/gtfs.de/Nahverkehr_corr.zip";
@@ -94,6 +94,14 @@ public class RunGTFS2MATSim {
 //		sets link speeds to the maximum speed of all train trips that travel on this link
 //		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
+		
+		scenario.getNetwork().getLinks().values().forEach(link -> {
+			if (link.getLength() == 0) {
+				log.warn("Link length is 0. Setting to 50. Link: " + link.getId().toString());
+				link.setLength(50.);
+				link.setFreespeed(50.);
+			}
+		});
 		
 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles.xml.gz");
 		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule.xml.gz");
@@ -255,11 +263,11 @@ public class RunGTFS2MATSim {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			double speed = linkMaxSpeed.get(link.getId());
 			link.setFreespeed(speed);
-			if (speed>200./3.6) {
-				log.warn("Link speed is higher than 200 km/h on link " + link.getId()+ " - Speed is " + Math.round(speed*3.6) + " km/h");
+			if (speed>300./3.6) {
+				log.warn("Link speed is higher than 300 km/h on link " + link.getId()+ " - Speed is " + Math.round(speed*3.6) + " km/h");
 			}
-			if (speed<30./3.6) {
-				log.warn("Link speed is lower than 30 km/h on link " + link.getId()+ " - Speed is " + Math.round(speed*3.6) + " km/h");
+			if (speed<1./3.6) {
+				log.warn("Link speed is lower than 1 km/h on link " + link.getId()+ " - Speed is " + Math.round(speed*3.6) + " km/h");
 			}
 		}
 		
