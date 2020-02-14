@@ -60,16 +60,16 @@ public class AirplaneTrainSwitcherIndividualRaptorParametersForPerson implements
 
 			if (modeParams != null) {
 //				if (mode.equals(TransportMode.airplane) && random.nextBoolean()) {
-				if ((mode.equals(TransportMode.airplane) || mode.equals(TransportMode.train)) && random.nextBoolean()) {
+				if ((mode.equals(TransportMode.airplane) || mode.equals("longDistanceTrain")) && random.nextBoolean()) {
 					// our addition: switch off by random usage of airplane
 					raptorParameters.setMarginalUtilityOfTravelTime_utl_s(mode,
 							1000000.0d * (modeParams.marginalUtilityOfTraveling_s - marginalUtilityOfPerforming));
-					if (mode.equals(TransportMode.airplane)) {
-						log.fatal("switching off airplane by setting very high MarginalUtilityOfTravelTime_utl_s");
-					}
-					if (mode.equals(TransportMode.train)) {
-						log.fatal("switching off train by setting very high MarginalUtilityOfTravelTime_utl_s");
-					}
+//					if (mode.equals(TransportMode.airplane)) {
+//						log.fatal("switching off airplane by setting very high MarginalUtilityOfTravelTime_utl_s");
+//					}
+//					if (mode.equals(TransportMode.train)) {
+//						log.fatal("switching off train by setting very high MarginalUtilityOfTravelTime_utl_s");
+//					}
 				} else {
 					// default: copy from PlanCalcScoreConfigGroup
 					raptorParameters.setMarginalUtilityOfTravelTime_utl_s(mode,
