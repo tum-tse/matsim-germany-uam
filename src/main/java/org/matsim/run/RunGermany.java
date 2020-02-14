@@ -106,8 +106,8 @@ public class RunGermany {
 	private static final String inputNetworkPlane = 		"network_plane.xml";
 	private static final String inputSchedulePlane =		"transit_schedule_plane.xml";
 	private static final String inputVehiclesPlane =		"transit_vehicles_plane.xml";
-	
-	private static final String inputPlans =				"germany_0.1pct.xml";
+
+	private static final String inputPlans =				"germany_0.01pct.xml";
 	
 	private static final String longDistanceTrain = 		"longDistanceTrain";
 	private static final String regionalTrain = 			"regionalTrain";
@@ -123,7 +123,7 @@ public class RunGermany {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		Config config = ConfigUtils.loadConfig(inputDir + "germanyConfig.xml");
 		
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(100);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 		config.controler().setOutputDirectory(inputDir + "/Output");
 //		config.controler().setRunId(runid);
@@ -161,7 +161,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsReRoute = new StrategySettings();
 		stratSetsReRoute.setStrategyName(DefaultStrategy.ReRoute);
-		stratSetsReRoute.setWeight(0.1);
+		stratSetsReRoute.setWeight(0.05);
 		
 //		StrategySettings stratSetsTimeAllocation = new StrategySettings();
 //		stratSetsTimeAllocation.setStrategyName(DefaultStrategy.TimeAllocationMutator_ReRoute);
@@ -170,7 +170,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeTripMode = new StrategySettings();
 		stratSetsChangeTripMode.setStrategyName(DefaultStrategy.ChangeTripMode);
-		stratSetsChangeTripMode.setWeight(0.1);
+		stratSetsChangeTripMode.setWeight(0.05);
 		
 		String[] changeModes = new String[2];
 		changeModes[0] = "car";
@@ -179,7 +179,7 @@ public class RunGermany {
 		
 		StrategySettings stratSetsChangeExpBeta = new StrategySettings();
 		stratSetsChangeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
-		stratSetsChangeExpBeta.setWeight(0.8);
+		stratSetsChangeExpBeta.setWeight(0.9);
 		
 		config.strategy().addStrategySettings(stratSetsReRoute);
 //		config.strategy().addStrategySettings(stratSetsTimeAllocation);
@@ -191,7 +191,7 @@ public class RunGermany {
 		config.plans().setInputFile(inputPlans);
 		
 		config.transit().setUseTransit(true);
-		config.transitRouter().setMaxBeelineWalkConnectionDistance(300);
+		config.transitRouter().setMaxBeelineWalkConnectionDistance(500);
 		
 		Set<String> transitModes = new HashSet<>();
 //		transitModes.add(TransportMode.train);
@@ -396,11 +396,11 @@ public class RunGermany {
 				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
-//		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
-//		
-//		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
-//		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml");
-//		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml");
+		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
+		
+		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml");
 		
 		controler.run();
 
