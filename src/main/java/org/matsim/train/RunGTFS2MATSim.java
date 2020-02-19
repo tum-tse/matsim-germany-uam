@@ -74,20 +74,19 @@ public class RunGTFS2MATSim {
 //		Scenario DBScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(DBGTFSFile, "2016-11-24", "DB_");
 		
 		Scenario FernScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(FernGTFSFile, "2020-02-11", "Fern_");
-		
 		mergeSchedules("Fern_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), FernScenario.getTransitSchedule(), "longDistanceTrain");
 		mergeVehicles("Fern_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), FernScenario.getTransitVehicles());
 		
 		Scenario RegioScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(RegioGTFSFile, "2020-02-11", "Regio_");
-		
 		mergeSchedules("Regio_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), RegioScenario.getTransitSchedule(), "regionalTrain");
 		mergeVehicles("Regio_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), RegioScenario.getTransitVehicles());
 		
 		Scenario NahScenario = new CreatePtScheduleAndVehiclesFromGtfs().run(NahGTFSFile, "2020-02-11", "Nah_");
-		
-		mergeSchedules("Nah_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), NahScenario.getTransitSchedule(), "localPublicTransport");
+//		getTsWithLinesWithMoreThanXxDep is used to reduce the size of the transit schedule. 
+//		It is set so the transit schedule only contains lines with more than ten departures  which reduces the number of lines by approx. 30%.
+//		This reduces computing time during the simulation by approx. 50%
+		mergeSchedules("Nah_", scenario.getTransitSchedule().getFactory(), scenario.getTransitSchedule(), getTsWithLinesWithMoreThanXxDep(NahScenario.getTransitSchedule(), 10), "localPublicTransport");
 		mergeVehicles("Nah_", scenario.getTransitVehicles().getFactory(), scenario.getTransitVehicles(), NahScenario.getTransitVehicles());
-	
 		
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "Train_").createNetwork();
 		
@@ -95,26 +94,21 @@ public class RunGTFS2MATSim {
 //		this should insure, that no trips are late, some may, however, be early
 		setLinkSpeedsToMax(scenario);
 		
-		scenario.getNetwork().getLinks().values().forEach(link -> {
-			if (link.getLength() == 0) {
-				log.warn("Link length is 0. Setting to 50. Link: " + link.getId().toString());
-				link.setLength(50.);
-				link.setFreespeed(50.);
-			}
-		});
-		
-		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles.xml.gz");
-		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule.xml.gz");
-		new NetworkWriter(scenario.getNetwork()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network.xml.gz");
-		
 //		sets link speeds to an average speed of all train trips that travel on this link
 //		setLinkSpeedsToAverage(scenario);
 		
+//		check for links with length zero and set lenghts of these links to 50 
+		checkNetworkForLinksWithLenght0(scenario);
+		
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles_cleaned.xml.gz");
+		new TransitScheduleWriterV2(scenario.getTransitSchedule()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule_cleaned.xml.gz");
+		new NetworkWriter(scenario.getNetwork()).write(svnDir + "public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network_cleaned.xml.gz");
+		
+//		run to check scenario
 //		runScenario(scenario);
 
 	}
 
-	
 	 static void runScenario(Scenario scenario) {
 		
 		Config config = scenario.getConfig();
@@ -319,6 +313,60 @@ public class RunGTFS2MATSim {
 			Vehicle vehicleWithNewId = vehiclesFactory.createVehicle(Id.createVehicleId(prefix + vehicle.getId().toString()),vehicleTypeWithNewId);
 			vehicles.addVehicle(vehicleWithNewId);
 		});
+
+	}
+	
+	private static void checkNetworkForLinksWithLenght0(Scenario scenario) {
+		scenario.getNetwork().getLinks().values().forEach(link -> {
+			if (link.getLength() == 0) {
+				log.warn("Link length is 0. Setting to 50. Link: " + link.getId().toString());
+				link.setLength(50.);
+				link.setFreespeed(50.);
+			}
+		});
+	}
+	
+	public static TransitSchedule getTsWithLinesWithMoreThanXxDep(TransitSchedule ts, int minNoOfDep) {
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		TransitSchedule newTs = scenario.getTransitSchedule();
+		
+		Map<Id<TransitLine>, Integer> map = new HashMap<Id<TransitLine>, Integer>();
+		
+		ts.getTransitLines().values().forEach(line -> {
+			int noOfDepartures = 0;
+			for (TransitRoute route : line.getRoutes().values()) {
+				noOfDepartures += route.getDepartures().size();
+			}
+			map.put(line.getId(), noOfDepartures);
+		});
+		log.warn("No of lines in original schedule: " + ts.getTransitLines().size());
+		int noOfLinesToBeDeleted = 0;
+		for (int ii : map.values()) {
+			if (ii <= minNoOfDep ) {
+				noOfLinesToBeDeleted++;
+			}
+
+		}
+
+		log.warn("No of lines which don't have at least " + minNoOfDep + " departures: " + noOfLinesToBeDeleted);
+		
+		for (Id<TransitLine> lineId: map.keySet()) {
+			if (map.get(lineId) > minNoOfDep) {
+				TransitLine line = ts.getTransitLines().get(lineId);
+				newTs.addTransitLine(line);
+				for (TransitRoute route : line.getRoutes().values()) {
+					for (TransitRouteStop stop : route.getStops()) {
+						if (!newTs.getFacilities().containsKey(stop.getStopFacility().getId())) {
+							newTs.addStopFacility(stop.getStopFacility());
+						}
+					}
+				}
+			}
+		}
+		
+		log.warn("No of lines in new schedule: " + newTs.getTransitLines().size());
+		return newTs;
 
 	}
 	
