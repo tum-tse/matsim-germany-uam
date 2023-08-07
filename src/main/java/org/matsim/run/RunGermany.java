@@ -89,7 +89,7 @@ public class RunGermany {
 //	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitSchedule.xml.gz";
 //	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2019_DB_GTFS_transitVehicles.xml.gz";
 	
-//	contains 2020 train data from gtfs.de
+//	contains 2020 train data from gtfs.de --> update gtfs
 	private static final String inputNetworkTrain =		 	 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_network_cleaned.xml.gz";
 	private static final String inputScheduleTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitSchedule_cleaned.xml.gz";
 	private static final String inputVehiclesTrain =		 "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/germany/input/2020_Train_GTFS_transitVehicles_cleaned.xml.gz";
