@@ -143,8 +143,13 @@ public class CreatePtScheduleAndVehiclesFromGtfs {
         System.out.println("Parsed routes: " + feed.routes.size());
         System.out.println("Parsed stops: " + feed.stops.size());
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        GtfsConverter converter = new GtfsConverter(feed, scenario, transformation, false);
-        converter.setDate(date);
+        GtfsConverter converter = GtfsConverter.newBuilder()
+                .setFeed(feed)
+                .setScenario(scenario)
+                .setTransform(transformation)
+                .setUseExtendedRouteTypes(false)
+                .setDate(date)
+                .build();
         converter.convert();
         System.out.println("Converted stops: " + scenario.getTransitSchedule().getFacilities().size());
         
