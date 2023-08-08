@@ -54,6 +54,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.simwrapper.SimWrapperModule;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
@@ -396,6 +397,9 @@ public class RunGermany {
 				bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
 			}
 		} );
+
+		controler.addOverridingModule(new SimWrapperModule());
+
 		ConfigUtils.writeConfig(scenario.getConfig(), inputDir + "configGermany.xml");
 		
 		NetworkUtils.writeNetwork(scenario.getNetwork(), inputDir + "GermanyNetwork.xml");
