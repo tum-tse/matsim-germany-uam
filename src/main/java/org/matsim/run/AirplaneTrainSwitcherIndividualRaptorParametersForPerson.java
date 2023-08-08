@@ -4,8 +4,6 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.RaptorParameters;
 import ch.sbb.matsim.routing.pt.raptor.RaptorParametersForPerson;
 import ch.sbb.matsim.routing.pt.raptor.RaptorUtils;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -32,7 +30,7 @@ public class AirplaneTrainSwitcherIndividualRaptorParametersForPerson implements
 	private final SwissRailRaptorConfigGroup raptorConfig;
 	private final ScoringParametersForPerson parametersForPerson;
 	private final Random random;
-	private static final Logger log = Logger.getLogger(AirplaneTrainSwitcherIndividualRaptorParametersForPerson.class);
+
 
 	@Inject
 	public AirplaneTrainSwitcherIndividualRaptorParametersForPerson(Config config, ScoringParametersForPerson parametersForPerson) {

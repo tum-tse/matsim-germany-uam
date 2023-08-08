@@ -33,16 +33,16 @@ public class RunCreateDemand {
 
 	public static void main(String[] args) {
 		
-		boolean train = true;
+		boolean train = false;
 		boolean car = true;
-		boolean airplane = true;
-		boolean pt = true;
+		boolean airplane = false;
+		boolean pt = false;
 		boolean bike = false;
 		boolean walk = false;
 		
 		double sample = 0.1;
 		
-		String outputPopulationFile = "output/test" + 100 * sample + "pct.xml";
+		String outputPopulationFile = "output/onlyCar" + 100 * sample + "pct.xml";
 		
 		
 		try {

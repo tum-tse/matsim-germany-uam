@@ -37,7 +37,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.distribution.EnumeratedDistribution;
 import org.apache.commons.math3.util.Pair;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -64,14 +64,10 @@ import org.locationtech.jts.geom.*;
 
 public class CreateDemand {
 
-	private static final Logger log = Logger.getLogger(CreateDemand.class);
 	
 	private static Map<String, Geometry> regions;
-	
 	private static EnumeratedDistribution<Geometry> landcover;
-	
-	private static Population population; 
-	
+	private static Population population;
 	private static final GeometryFactory geometryFactory = new GeometryFactory();
 	
 	private static final Random random = new Random(100);
@@ -94,7 +90,7 @@ public class CreateDemand {
 		}
 		
 		landcover = new EnumeratedDistribution<>(weightedGeometries);
-		File demandInput = new File("../shared-svn/studies/countries/de/prognose_2030/PVMatrix_BVWP15_A2010/SM_PVMatrix_BVWP15_A2010.csv");
+		File demandInput = new File("../../shared-svn/studies/countries/de/prognose_2030/PVMatrix_BVWP15_A2010/SM_PVMatrix_BVWP15_A2010.csv");
 		// read the bvwp csv file
 		try (CSVParser parser = CSVParser.parse(demandInput, StandardCharsets.UTF_8, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
 
@@ -492,7 +488,6 @@ public class CreateDemand {
 			return new Coord(x, y); }
 		
 		else {
-			log.warn("No coord found in landcover, used region centroid. Region: " + geometryKey) ;
 			return new Coord(region.getCentroid().getX(), region.getCentroid().getY() );
 		}
 	}
