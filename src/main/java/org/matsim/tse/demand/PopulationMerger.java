@@ -22,8 +22,7 @@ public class PopulationMerger {
         String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_merged.xml.gz"; // Path for the merged file
 
         Config config = ConfigUtils.createConfig();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        Population mergedPopulation = scenario.getPopulation();
+        Population mergedPopulation = ScenarioUtils.createScenario(config).getPopulation();
 
         try (Stream<Path> paths = Files.walk(Paths.get(folderPath))) {
             paths.filter(Files::isRegularFile)
