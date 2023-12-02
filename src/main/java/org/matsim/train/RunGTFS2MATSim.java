@@ -149,7 +149,7 @@ public class RunGTFS2MATSim {
 				double departureTime = 0;
 				for (int ii = 0; ii < transitRoute.getStops().size(); ii++) {
 					
-					arrivalTime = transitRoute.getStops().get(ii).getArrivalOffset();
+					arrivalTime = transitRoute.getStops().get(ii).getArrivalOffset().seconds();
 					Id<Link> linkId = null;
 					if (ii == 0) {
 						linkId = transitRoute.getRoute().getStartLinkId();
@@ -179,7 +179,7 @@ public class RunGTFS2MATSim {
 						
 					}
 					
-					departureTime = transitRoute.getStops().get(ii).getDepartureOffset();
+					departureTime = transitRoute.getStops().get(ii).getDepartureOffset().seconds();
 				}
 				
 				
@@ -216,7 +216,7 @@ public class RunGTFS2MATSim {
 				double departureTime = 0;
 				for (int ii = 0; ii < transitRoute.getStops().size(); ii++) {
 					
-					arrivalTime = transitRoute.getStops().get(ii).getArrivalOffset();
+					arrivalTime = transitRoute.getStops().get(ii).getArrivalOffset().seconds();
 					Id<Link> linkId = null;
 					if (ii == 0) {
 						linkId = transitRoute.getRoute().getStartLinkId();
@@ -246,7 +246,7 @@ public class RunGTFS2MATSim {
 						
 					}
 					
-					departureTime = transitRoute.getStops().get(ii).getDepartureOffset();
+					departureTime = transitRoute.getStops().get(ii).getDepartureOffset().seconds();
 				}
 				
 				
@@ -283,7 +283,7 @@ public class RunGTFS2MATSim {
 						else {
 							transitStopWithNewId = schedule.getFacilities().get(Id.create(prefix + stop.getStopFacility().getId(), TransitStopFacility.class));
 						}
-						TransitRouteStop transitRouteStopWithNewId = tsf.createTransitRouteStop(transitStopWithNewId, stop.getArrivalOffset(), stop.getDepartureOffset());
+						TransitRouteStop transitRouteStopWithNewId = tsf.createTransitRouteStop(transitStopWithNewId, stop.getArrivalOffset().seconds(), stop.getDepartureOffset().seconds());
 						transitRouteStopWithNewId.setAwaitDepartureTime(true);
 						stops.add(transitRouteStopWithNewId);
 					});

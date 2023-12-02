@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -151,7 +152,7 @@ public class RunGermany {
 		
 		// vsp defaults
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.VspDefaultsCheckingLevel.info );
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink);
 		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
 		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
 		
@@ -440,7 +441,7 @@ class MyScoringFunction implements ScoringFunction {
 
 	@Override
 	public void handleLeg(Leg leg) {
-		score -= leg.getTravelTime();
+		score -= leg.getTravelTime().seconds();
 		
 		if (leg.getMode().equals(TransportMode.airplane) ) {
 			score -= 2 * 3600;
@@ -460,6 +461,11 @@ class MyScoringFunction implements ScoringFunction {
 	public void addMoney(double amount) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void addScore(double amount) {
+
 	}
 
 	@Override
