@@ -23,7 +23,7 @@ public class PopulationMerger {
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
-        Population mergedPopulation = PopulationUtils.createPopulation(config);
+        Population mergedPopulation = scenario.getPopulation();
 
         try (Stream<Path> paths = Files.walk(Paths.get(folderPath))) {
             paths.filter(Files::isRegularFile)
