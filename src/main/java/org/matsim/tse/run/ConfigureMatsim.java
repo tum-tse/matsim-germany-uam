@@ -87,6 +87,7 @@ public class ConfigureMatsim {
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
         config.plansCalcRoute().addModeRoutingParams(carPassengerParams);
 
+        //TODO: need to model pt
         PlansCalcRouteConfigGroup.ModeRoutingParams ptParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("pt");
         ptParams.setBeelineDistanceFactor(1.5);
         ptParams.setTeleportedModeSpeed(50 / 3.6);
@@ -102,7 +103,7 @@ public class ConfigureMatsim {
         walkParams.setTeleportedModeSpeed(5 / 3.6);
         config.plansCalcRoute().addModeRoutingParams(walkParams);
 
-        String runId = "mito_assignment";
+        String runId = "tse_germany_model";
         config.controler().setRunId(runId);
         //config.network().setInputFile();
 
