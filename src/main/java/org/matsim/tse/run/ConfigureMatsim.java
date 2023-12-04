@@ -1,8 +1,5 @@
 package org.matsim.tse.run;
 
-import de.tum.bgu.msm.data.Mode;
-import de.tum.bgu.msm.resources.Properties;
-import de.tum.bgu.msm.resources.Resources;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -14,7 +11,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.TransportMode;
+
 public class ConfigureMatsim {
+
+    public static double siloSamplingFactor = 1.0; //TODO: my own setting, need to check if this is correct
 
     public static Config configureMatsim() {
 
@@ -82,7 +83,7 @@ public class ConfigureMatsim {
         airportActivity.setTypicalDuration(1 * 60 * 60);
         config.planCalcScore().addActivityParams(airportActivity);
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("car_passenger");
+        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("ride"); // TODO: I think we do not need to do this for car mode
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
         config.plansCalcRoute().addModeRoutingParams(carPassengerParams);
 
@@ -103,26 +104,24 @@ public class ConfigureMatsim {
 
         String runId = "mito_assignment";
         config.controler().setRunId(runId);
-        config.network().setInputFile(Resources.instance.getBaseDirectory().toString() + "/" + Resources.instance.getString(Properties.MATSIM_NETWORK_FILE));
+        //config.network().setInputFile();
 
         config.qsim().setNumberOfThreads(16);
         config.global().setNumberOfThreads(16);
         config.parallelEventHandling().setNumberOfThreads(16);
         //config.qsim().setUsingThreadpool(false); removed for compatibility with 14.0
 
-        config.controler().setLastIteration(Resources.instance.getInt(Properties.MATSIM_ITERATIONS));
+        config.controler().setLastIteration(200); //TODO: my own setting
         config.controler().setWritePlansInterval(config.controler().getLastIteration());
         config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 
         config.qsim().setStuckTime(10);
 
-        double siloSamplingFactor = Resources.instance.getDouble(Properties.SP_SCALING_FACTOR, 1.0) *
-                Resources.instance.getDouble(Properties.SCALE_FACTOR_FOR_TRIP_GENERATION, 1.0);
-        config.qsim().setFlowCapFactor(siloSamplingFactor * Double.parseDouble(Resources.instance.getString(Properties.TRIP_SCALING_FACTOR)));
-        config.qsim().setStorageCapFactor(siloSamplingFactor * Double.parseDouble(Resources.instance.getString(Properties.TRIP_SCALING_FACTOR)));
+        config.qsim().setFlowCapFactor(siloSamplingFactor);
+        config.qsim().setStorageCapFactor(siloSamplingFactor);
 
 
-        String[] networkModes = Resources.instance.getArray(Properties.MATSIM_NETWORK_MODES, new String[]{"autoDriver"});
+/*        String[] networkModes = Resources.instance.getArray(Properties.MATSIM_NETWORK_MODES, new String[]{"autoDriver"});
         Set<String> networkModesSet = new HashSet<>();
 
         for (String mode : networkModes) {
@@ -130,8 +129,14 @@ public class ConfigureMatsim {
             if (!networkModesSet.contains(matsimMode)) {
                 networkModesSet.add(matsimMode);
             }
-        }
+        }*/
 
+        Set<String> networkModesSet = new HashSet<>();
+        networkModesSet.add(TransportMode.car);
+        networkModesSet.add(TransportMode.pt);
+        networkModesSet.add(TransportMode.bike);
+        networkModesSet.add(TransportMode.walk);
+        networkModesSet.add(TransportMode.ride);
         config.plansCalcRoute().setNetworkModes(networkModesSet);
 
         return config;
@@ -141,10 +146,8 @@ public class ConfigureMatsim {
 
     public static void setDemandSpecificConfigSettings(Config config) {
 
-        double siloSamplingFactor = Resources.instance.getDouble(Properties.SP_SCALING_FACTOR, 1.0) *
-                Resources.instance.getDouble(Properties.SCALE_FACTOR_FOR_TRIP_GENERATION, 1.0);
-        config.qsim().setFlowCapFactor(siloSamplingFactor * Double.parseDouble(Resources.instance.getString(Properties.TRIP_SCALING_FACTOR)));
-        config.qsim().setStorageCapFactor(siloSamplingFactor * Double.parseDouble(Resources.instance.getString(Properties.TRIP_SCALING_FACTOR)));
+        config.qsim().setFlowCapFactor(siloSamplingFactor);
+        config.qsim().setStorageCapFactor(siloSamplingFactor);
 
         PlanCalcScoreConfigGroup.ActivityParams homeActivity = new PlanCalcScoreConfigGroup.ActivityParams("home");
         homeActivity.setTypicalDuration(12 * 60 * 60);

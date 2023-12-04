@@ -1,12 +1,5 @@
 package org.matsim.tse.run;
 
-import de.tum.bgu.msm.MitoModelGermany;
-import de.tum.bgu.msm.data.DataSet;
-import de.tum.bgu.msm.resources.Properties;
-import de.tum.bgu.msm.resources.Resources;
-import de.tum.bgu.msm.trafficAssignment.CarSkimUpdater;
-import de.tum.bgu.msm.trafficAssignment.ConfigureMatsim;
-import de.tum.bgu.msm.util.munich.MunichImplementationConfig;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -16,15 +9,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunGermanyScenario {
 
-    private static final Logger logger = Logger.getLogger(MitoGermany.class);
+    private static final Logger logger = Logger.getLogger(RunGermanyScenario.class);
 
     public static void main(String[] args) {
-        logger.info("Started the Microsimulation Transport Orchestrator (MITO) based on 2017 models");
+/*        logger.info("Started the Microsimulation Transport Orchestrator (MITO) based on 2017 models");
         MitoModelGermany model = MitoModelGermany.standAloneModel(args[0], MunichImplementationConfig.get());
         model.run();
-        final DataSet dataSet = model.getData();
+        final DataSet dataSet = model.getData();*/
 
-        boolean runAssignment = Resources.instance.getBoolean(Properties.RUN_TRAFFIC_ASSIGNMENT, false);
+        boolean runAssignment = true;
 
         if (runAssignment) {
             logger.info("Running traffic assignment in MATsim");
@@ -38,19 +31,17 @@ public class RunGermanyScenario {
                 config = ConfigureMatsim.configureMatsim();
             }
 
-            String outputSubDirectory = "scenOutput/" + model.getScenarioName() + "/" + dataSet.getYear();
-            config.controler().setOutputDirectory(Resources.instance.getBaseDirectory().toString() + "/" + outputSubDirectory + "/trafficAssignment");
+            config.controler().setOutputDirectory();
 
             MutableScenario matsimScenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-            matsimScenario.setPopulation(dataSet.getPopulation());
+            matsimScenario.setNetwork();
+            matsimScenario.setTransitSchedule();
+            matsimScenario.setTransitVehicles();
+            matsimScenario.setPopulation();
 
             Controler controler = new Controler(matsimScenario);
             controler.run();
 
-            if (Resources.instance.getBoolean(Properties.PRINT_OUT_SKIM, false)) {
-                CarSkimUpdater skimUpdater = new CarSkimUpdater(controler, model.getData(), model.getScenarioName());
-                skimUpdater.run();
-            }
         }
     }
 }
