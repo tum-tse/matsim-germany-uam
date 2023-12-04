@@ -36,7 +36,7 @@ public class RunGermanyScenario {
             config.network().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/final-version/network_with-rail.xml.gz");
             config.transit().setTransitScheduleFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_transitSchedule_cleaned.xml.gz");
             config.transit().setVehiclesFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_transitVehicles_cleaned.xml.gz");
-            config.plans().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/prepare-for-merge/trips_germanySD_2030_100percent.xml.gz");
+            config.plans().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_0.1percent.xml.gz");
 
             //MutableScenario matsimScenario = (MutableScenario) ScenarioUtils.loadScenario(config);
             Scenario matsimScenario = ScenarioUtils.loadScenario(config) ;

@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.TransportMode;
 
 public class ConfigureMatsim {
 
-    public static double siloSamplingFactor = 1.0; //TODO: my own setting, need to check if this is correct
+    public static double siloSamplingFactor = 0.01; //TODO: my own setting, need to check if this is correct
 
     public static Config configureMatsim() {
 
@@ -27,8 +27,9 @@ public class ConfigureMatsim {
         Config config = ConfigUtils.createConfig();
         config.controler().setFirstIteration(0);
         config.controler().setMobsim("qsim");
-        config.controler().setWritePlansInterval(config.controler().getLastIteration());
-        config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+        config.controler().setWritePlansInterval(1);
+        config.controler().setWriteEventsInterval(1);
+        config.controler().setWriteTripsInterval(1);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         config.qsim().setEndTime(26 * 3600);
@@ -83,15 +84,15 @@ public class ConfigureMatsim {
         airportActivity.setTypicalDuration(1 * 60 * 60);
         config.planCalcScore().addActivityParams(airportActivity);
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("ride"); // TODO: I think we do not need to do this for car mode
+/*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("ride"); // TODO: I think we do not need to do this for car mode
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
-        config.plansCalcRoute().addModeRoutingParams(carPassengerParams);
+        config.plansCalcRoute().addModeRoutingParams(carPassengerParams);*/
 
-        //TODO: need to model pt
+/*        //TODO: need to model pt
         PlansCalcRouteConfigGroup.ModeRoutingParams ptParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("pt");
         ptParams.setBeelineDistanceFactor(1.5);
         ptParams.setTeleportedModeSpeed(50 / 3.6);
-        config.plansCalcRoute().addModeRoutingParams(ptParams);
+        config.plansCalcRoute().addModeRoutingParams(ptParams);*/
 
         PlansCalcRouteConfigGroup.ModeRoutingParams bicycleParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("bike");
         bicycleParams.setBeelineDistanceFactor(1.3);
@@ -107,7 +108,7 @@ public class ConfigureMatsim {
         config.controler().setRunId(runId);
         //config.network().setInputFile();
 
-        config.qsim().setNumberOfThreads(16);
+        config.qsim().setNumberOfThreads(32);
         config.global().setNumberOfThreads(16);
         config.parallelEventHandling().setNumberOfThreads(16);
         //config.qsim().setUsingThreadpool(false); removed for compatibility with 14.0
@@ -135,8 +136,8 @@ public class ConfigureMatsim {
         Set<String> networkModesSet = new HashSet<>();
         networkModesSet.add(TransportMode.car);
         networkModesSet.add(TransportMode.pt);
-        networkModesSet.add(TransportMode.bike);
-        networkModesSet.add(TransportMode.walk);
+        //networkModesSet.add(TransportMode.bike);
+        //networkModesSet.add(TransportMode.walk);
         networkModesSet.add(TransportMode.ride);
         config.plansCalcRoute().setNetworkModes(networkModesSet);
 
