@@ -130,6 +130,9 @@ public class ConfigureMatsim {
         config.parallelEventHandling().setNumberOfThreads(16);
         //config.qsim().setUsingThreadpool(false); removed for compatibility with 14.0
 
+        config.transit().setInputScheduleCRS("EPSG:31467");
+        //TODO: need to also set the CRS for pt network
+
         config.controler().setLastIteration(200); //TODO: my own setting
         config.controler().setWritePlansInterval(config.controler().getLastIteration());
         config.controler().setWriteEventsInterval(config.controler().getLastIteration());
@@ -158,6 +161,9 @@ public class ConfigureMatsim {
         //networkModesSet.add(TransportMode.walk);
         networkModesSet.add("carPassenger");
         config.plansCalcRoute().setNetworkModes(networkModesSet);
+
+        //To prevent error message like "No route found from node Train_Fern_488 to node Train_Fern_668 by mode pt."
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
         return config;
     }
