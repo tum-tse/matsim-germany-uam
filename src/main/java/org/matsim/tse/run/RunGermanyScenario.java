@@ -60,14 +60,14 @@ public class RunGermanyScenario {
             } );
 
             controler.addOverridingModule(new SwissRailRaptorModule());
-/*            controler.addOverridingModule( new AbstractModule(){
+            controler.addOverridingModule( new AbstractModule(){
                 @Override public void install() {
 //				this.bindScoringFunctionFactory().to( MyScoringFunctionFactory.class ) ;
 //				install( new SwissRailRaptorModule() );
                     //bind(RaptorParametersForPerson.class).to(AirplaneTrainSwitcherIndividualRaptorParametersForPerson.class);
                     bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
                 }
-            } );*/
+            } );
 
             controler.run();
 
