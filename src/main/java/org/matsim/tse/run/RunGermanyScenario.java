@@ -9,11 +9,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.run.AirplaneTrainSwitcherIndividualRaptorParametersForPerson;
 import org.matsim.run.MyMainModeIdentifier;
+import org.matsim.vehicles.MatsimVehicleWriter;
 
 public class RunGermanyScenario {
 
@@ -68,6 +71,14 @@ public class RunGermanyScenario {
                     bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
                 }
             } );
+
+            //write the input files
+            String inputDir = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/final-version/latest_input_files/";
+            ConfigUtils.writeConfig(matsimScenario.getConfig(), inputDir + "configGermany.xml");
+
+            NetworkUtils.writeNetwork(matsimScenario.getNetwork(), inputDir + "GermanyNetwork.xml.gz");
+            new MatsimVehicleWriter(matsimScenario.getTransitVehicles()).writeFile(inputDir + "GermanyTransitVehicles.xml.gz");
+            new TransitScheduleWriter(matsimScenario.getTransitSchedule()).writeFile(inputDir + "GermanyTransitSchedule.xml.gz");
 
             controler.run();
 
