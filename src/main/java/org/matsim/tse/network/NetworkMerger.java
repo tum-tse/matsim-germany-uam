@@ -40,7 +40,7 @@ public class NetworkMerger {
 
         // Load and clean rail (pt) network
         Network railNetwork = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(railNetwork).readFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_network_cleaned.xml.gz");
+        new MatsimNetworkReader(railNetwork).readFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_network.xml.gz");
 
         // Clean the rail network
         //new NetworkCleaner().run(railNetwork); //TODO: Check if this is necessary
