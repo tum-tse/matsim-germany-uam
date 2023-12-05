@@ -2,8 +2,10 @@ package org.matsim.tse.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -41,6 +43,17 @@ public class RunGermanyScenario {
             //MutableScenario matsimScenario = (MutableScenario) ScenarioUtils.loadScenario(config);
             Scenario matsimScenario = ScenarioUtils.loadScenario(config) ;
             Controler controler = new Controler(matsimScenario);
+
+            // use the (congested) car travel time for the teleported carPassenger mode
+            // Seems like a nice trick, but does not work so well: All carPassenger trips found in the 0th iteration use the free speed travel time, which is much too fast.  And they
+            // remember this forever. kai, mar'19
+            controler.addOverridingModule( new AbstractModule() {
+                @Override public void install() {
+                    addTravelTimeBinding( "carPassenger" ).to( networkTravelTime() );
+                    addTravelDisutilityFactoryBinding( "carPassenger" ).to( carTravelDisutilityFactoryKey() );
+                }
+            } );
+
             controler.run();
 
         }

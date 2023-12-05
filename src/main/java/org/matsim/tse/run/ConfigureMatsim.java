@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.TransportMode;
 
 public class ConfigureMatsim {
 
-    public static double siloSamplingFactor = 0.01; //TODO: my own setting, need to check if this is correct
+    public static double siloSamplingFactor = 1; //TODO: my own setting, need to check if this is correct
 
     public static Config configureMatsim() {
 
@@ -39,13 +39,30 @@ public class ConfigureMatsim {
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
             strategySettings.setStrategyName("ChangeExpBeta");
-            strategySettings.setWeight(0.8);
+            strategySettings.setWeight(0.85);
             config.strategy().addStrategySettings(strategySettings);
         }
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
             strategySettings.setStrategyName("ReRoute");
-            strategySettings.setWeight(0.2);
+            strategySettings.setWeight(0.05);
+            config.strategy().addStrategySettings(strategySettings);
+        }
+        {
+            StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
+            strategySettings.setStrategyName("SubtourModeChoice");
+            strategySettings.setWeight(0.05);
+            config.strategy().addStrategySettings(strategySettings);
+        }
+        String[] subtourModes = new String[]{TransportMode.car, /*"carPassenger",*/ TransportMode.pt, TransportMode.bike, TransportMode.walk}; //TODO: need to set the scoring params for carPassenger correctly!
+        String[] chainBasedModes = new String[]{TransportMode.car, TransportMode.bike};
+        config.subtourModeChoice().setModes(subtourModes);
+        config.subtourModeChoice().setChainBasedModes(chainBasedModes);
+
+        {
+            StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
+            strategySettings.setStrategyName("TimeAllocationMutator");
+            strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
         }
 //        {
@@ -84,7 +101,7 @@ public class ConfigureMatsim {
         airportActivity.setTypicalDuration(1 * 60 * 60);
         config.planCalcScore().addActivityParams(airportActivity);
 
-/*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("ride"); // TODO: I think we do not need to do this for car mode
+/*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("carPassenger"); // TODO: I think we do not need to do this for car mode
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
         config.plansCalcRoute().addModeRoutingParams(carPassengerParams);*/
 
@@ -133,12 +150,13 @@ public class ConfigureMatsim {
             }
         }*/
 
+        //config.plansCalcRoute().getNetworkModes().add(TransportMode.pt);
         Set<String> networkModesSet = new HashSet<>();
         networkModesSet.add(TransportMode.car);
         networkModesSet.add(TransportMode.pt);
         //networkModesSet.add(TransportMode.bike);
         //networkModesSet.add(TransportMode.walk);
-        networkModesSet.add(TransportMode.ride);
+        networkModesSet.add("carPassenger");
         config.plansCalcRoute().setNetworkModes(networkModesSet);
 
         return config;
