@@ -1,18 +1,24 @@
 package org.matsim.tse.network;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.utils.MergeNetworks;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import static org.matsim.tse.run.ConfigureMatsim.*;
 
 public class NetworkMerger {
 
@@ -35,12 +41,23 @@ public class NetworkMerger {
             }
             link.setAllowedModes(allowedModes);
         }
-        LOGGER.info("Finished adding ride mode to the road network");
+        LOGGER.info("Finished adding carPassenger mode to the road network");
 
 
         // Load and clean rail (pt) network
-        Network railNetwork = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(railNetwork).readFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_network.xml.gz");
+        Network originalrailNetwork = NetworkUtils.createNetwork();
+        new MatsimNetworkReader(originalrailNetwork).readFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_network.xml.gz");
+
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Network trainNetwork = originalrailNetwork;
+        Set<String> trainModes = new HashSet<>();
+        trainModes.add(TransportMode.train); //TODO: Check if this is necessary
+        trainModes.add(longDistanceTrain);
+        trainModes.add(regionalTrain);
+        trainModes.add(localPublicTransport);
+        trainNetwork.getLinks().values().forEach(l -> l.setAllowedModes(trainModes));
+        MergeNetworks.merge(scenario.getNetwork(),"", trainNetwork);
+        Network railNetwork = scenario.getNetwork();
 
         // Clean the rail network
         //new NetworkCleaner().run(railNetwork); //TODO: Check if this is necessary

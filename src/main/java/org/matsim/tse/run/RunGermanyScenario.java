@@ -1,5 +1,7 @@
 package org.matsim.tse.run;
 
+import ch.sbb.matsim.routing.pt.raptor.RaptorParametersForPerson;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -7,8 +9,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.run.AirplaneTrainSwitcherIndividualRaptorParametersForPerson;
+import org.matsim.run.MyMainModeIdentifier;
 
 public class RunGermanyScenario {
 
@@ -53,6 +58,16 @@ public class RunGermanyScenario {
                     addTravelDisutilityFactoryBinding( "carPassenger" ).to( carTravelDisutilityFactoryKey() );
                 }
             } );
+
+            controler.addOverridingModule(new SwissRailRaptorModule());
+/*            controler.addOverridingModule( new AbstractModule(){
+                @Override public void install() {
+//				this.bindScoringFunctionFactory().to( MyScoringFunctionFactory.class ) ;
+//				install( new SwissRailRaptorModule() );
+                    //bind(RaptorParametersForPerson.class).to(AirplaneTrainSwitcherIndividualRaptorParametersForPerson.class);
+                    bind(AnalysisMainModeIdentifier.class).to(MyMainModeIdentifier.class);
+                }
+            } );*/
 
             controler.run();
 

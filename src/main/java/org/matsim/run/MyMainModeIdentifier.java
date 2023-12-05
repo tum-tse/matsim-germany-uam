@@ -60,7 +60,7 @@ public final class MyMainModeIdentifier implements AnalysisMainModeIdentifier {
 		modeHierarchy.add( "regionalTrain" ) ;
 		modeHierarchy.add( "longDistanceTrain" ) ;
 //		modeHierarchy.add( TransportMode.train ) ;
-		modeHierarchy.add( TransportMode.airplane ) ;
+//		modeHierarchy.add( TransportMode.airplane ) ;
 
 		
 		
