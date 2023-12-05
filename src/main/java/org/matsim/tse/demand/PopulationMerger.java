@@ -18,8 +18,8 @@ import java.util.stream.Stream;
 public class PopulationMerger {
 
     public static void main(String[] args) {
-        String folderPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base/"; // Replace with your folder path
-        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_merged.xml.gz"; // Path for the merged file
+        String folderPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/prepare-for-merge"; // Replace with your folder path
+        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_100percent.xml.gz"; // Path for the merged file
 
         Config config = ConfigUtils.createConfig();
         Population mergedPopulation = ScenarioUtils.createScenario(config).getPopulation();
