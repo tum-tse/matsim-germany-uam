@@ -1,6 +1,7 @@
 package org.matsim.tse.network;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -9,6 +10,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class NetworkMerger {
@@ -22,6 +25,18 @@ public class NetworkMerger {
 
         // Clean the road network
         new NetworkCleaner().run(roadNetwork);
+
+        // Modify the car network
+        for (Link link : roadNetwork.getLinks().values()) {
+            Set<String> allowedModes = new HashSet<>();
+            if (link.getAllowedModes().contains(TransportMode.car)) {
+                allowedModes.add(TransportMode.car);
+                allowedModes.add("carPassenger");
+            }
+            link.setAllowedModes(allowedModes);
+        }
+        LOGGER.info("Finished adding ride mode to the road network");
+
 
         // Load and clean rail (pt) network
         Network railNetwork = NetworkUtils.createNetwork();
