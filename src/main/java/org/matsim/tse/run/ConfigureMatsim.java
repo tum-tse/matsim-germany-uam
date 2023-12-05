@@ -271,7 +271,6 @@ public class ConfigureMatsim {
         networkModesSet.add("carPassenger");
         config.plansCalcRoute().setNetworkModes(networkModesSet);
 
-        //To prevent error message like "No route found from node Train_Fern_488 to node Train_Fern_668 by mode pt."
         config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
         return config;
