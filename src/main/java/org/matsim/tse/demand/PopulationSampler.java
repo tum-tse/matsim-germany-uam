@@ -17,7 +17,7 @@ public class PopulationSampler {
 
     public static void main(String[] args) {
         String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_100percent.xml.gz"; // replace with your input file path
-        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_0.1percent.xml.gz"; // replace with your output file path
+        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_1percent.xml.gz"; // replace with your output file path
         double scaleFactor = 0.001; // Set your scale factor here
         // Write the new, sampled population to a file
         CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:31467");
