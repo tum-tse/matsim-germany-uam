@@ -35,7 +35,7 @@ public class ConfigureMatsim {
         config.controler().setLastIteration(200);
         config.controler().setMobsim("qsim");
         config.controler().setWritePlansInterval(1);
-        config.controler().setWriteEventsInterval(1);
+        config.controler().setWriteEventsInterval(1); //TODO: need to fix!
         config.controler().setWriteTripsInterval(1);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
