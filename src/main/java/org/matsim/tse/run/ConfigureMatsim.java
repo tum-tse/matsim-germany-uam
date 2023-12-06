@@ -273,7 +273,7 @@ public class ConfigureMatsim {
         networkModesSet.add("carPassenger");
         config.plansCalcRoute().setNetworkModes(networkModesSet);
 
-        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink); //TODO: need to check what does this do?
 
         return config;
     }
