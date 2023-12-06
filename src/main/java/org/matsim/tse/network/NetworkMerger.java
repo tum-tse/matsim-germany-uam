@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.MergeNetworks;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -19,6 +20,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.matsim.tse.run.ConfigureMatsim.*;
+import org.matsim.core.network.algorithms.NetworkTransform;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class NetworkMerger {
 
@@ -43,12 +47,18 @@ public class NetworkMerger {
         }
         LOGGER.info("Finished adding carPassenger mode to the road network");
 
+        CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:31467");
+        NetworkTransform networkTransform = new NetworkTransform(transformer);
+        networkTransform.run(roadNetwork);
+
 
         // Load and clean rail (pt) network
         Network originalrailNetwork = NetworkUtils.createNetwork();
         new MatsimNetworkReader(originalrailNetwork).readFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_network.xml.gz");
 
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Config config = ConfigUtils.createConfig();
+        //config.network().setInputCRS("EPSG:31467");
+        Scenario scenario = ScenarioUtils.createScenario(config);
         Network trainNetwork = originalrailNetwork;
         Set<String> trainModes = new HashSet<>();
         trainModes.add(TransportMode.train); //TODO: Check if this is necessary

@@ -17,7 +17,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 
 public class ConfigureMatsim {
 
-    public static double siloSamplingFactor = 1; //TODO: my own setting, need to check if this is correct
+    public static double siloSamplingFactor = 0.01; //TODO: my own setting, need to check if this is correct
 
     public static final String longDistanceTrain = 		"longDistanceTrain";
     public static final String regionalTrain = 			"regionalTrain";
@@ -32,6 +32,7 @@ public class ConfigureMatsim {
         //matsimConfig.controler().setOutputDirectory(outputDirectory);
         Config config = ConfigUtils.createConfig();
         config.controler().setFirstIteration(0);
+        config.controler().setLastIteration(200);
         config.controler().setMobsim("qsim");
         config.controler().setWritePlansInterval(1);
         config.controler().setWriteEventsInterval(1);
@@ -40,7 +41,7 @@ public class ConfigureMatsim {
 
         config.qsim().setEndTime(26 * 3600);
         config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-        config.vspExperimental().setWritingOutputEvents(true); // writes final events into toplevel directory
+        //config.vspExperimental().setWritingOutputEvents(true); // writes final events into toplevel directory
 
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
@@ -137,7 +138,8 @@ public class ConfigureMatsim {
         //config.qsim().setUsingThreadpool(false); removed for compatibility with 14.0
 
 
-
+        config.global().setCoordinateSystem("EPSG:31467");
+        //config.plans().setInputCRS("EPSG:31468");
 
         //set "longDistancePt"
         String[] changeModes = new String[2];

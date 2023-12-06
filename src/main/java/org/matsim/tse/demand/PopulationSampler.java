@@ -6,6 +6,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import java.util.Random;
 
@@ -14,9 +16,11 @@ public class PopulationSampler {
     private static final Random random = new Random(0);
 
     public static void main(String[] args) {
-        String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_100percent.xml.gz"; // replace with your input file path
-        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_0.1percent.xml.gz"; // replace with your output file path
+        String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_100percent.xml.gz"; // replace with your input file path
+        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_0.1percent.xml.gz"; // replace with your output file path
         double scaleFactor = 0.001; // Set your scale factor here
+        // Write the new, sampled population to a file
+        CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:31467");
 
         // Load the scenario with the existing population
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -34,8 +38,7 @@ public class PopulationSampler {
             }
         }
 
-        // Write the new, sampled population to a file
-        new PopulationWriter(outputPopulation).write(outputPopulationFile);
+        new PopulationWriter(transformer, outputPopulation).write(outputPopulationFile);
         System.out.println("Population sampling completed. Output written to: " + outputPopulationFile);
     }
 }
