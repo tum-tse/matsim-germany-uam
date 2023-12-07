@@ -16,8 +16,8 @@ public class PopulationSampler {
     private static final Random random = new Random(0);
 
     public static void main(String[] args) {
-        String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_merged.xml.gz"; // replace with your input file path
-        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_1percent_base_merged.xml.gz"; // replace with your output file path
+        String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/plan_all-trips_2030_100percent.xml.gz"; // replace with your input file path
+        String outputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/final-version/plan_all-trips_2030_1percent_transformed.xml.gz"; // replace with your output file path
         double scaleFactor = 0.01; // Set your scale factor here
         // Write the new, sampled population to a file
         CoordinateTransformation transformer = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:31467");
@@ -29,7 +29,6 @@ public class PopulationSampler {
 
         // Create a new population for the output
         Population outputPopulation = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-        PopulationFactory populationFactory = outputPopulation.getFactory();
 
         // Sample the population
         for (Person person : scenario.getPopulation().getPersons().values()) {
