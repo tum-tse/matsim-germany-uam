@@ -18,8 +18,8 @@ import java.util.stream.Stream;
 public class PopulationMerger {
 
     public static void main(String[] args) {
-        String folderPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/prepare-for-merge"; // Replace with your folder path
-        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_cleaned_100percent.xml.gz"; // Path for the merged file
+        String folderPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base"; // Replace with your folder path
+        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base.xml.gz"; // Path for the merged file
 
         Config config = ConfigUtils.createConfig();
         Population mergedPopulation = ScenarioUtils.createScenario(config).getPopulation();
@@ -85,11 +85,45 @@ public class PopulationMerger {
             Plan plan1 = person1.getPlans().get(i);
             Plan plan2 = person2.getPlans().get(i);
 
-            // Compare details of each plan (you may need to extend this comparison based on your plan structure)
-            System.exit(-1);
+            // Check if both plans have the same number of plan elements
+            if (plan1.getPlanElements().size() != plan2.getPlanElements().size()) {
+                return false;
+            }
+
+            // Iterate over all plan elements and compare them
+            for (int j = 0; j < plan1.getPlanElements().size(); j++) {
+                PlanElement pe1 = plan1.getPlanElements().get(j);
+                PlanElement pe2 = plan2.getPlanElements().get(j);
+
+                if (pe1 instanceof Activity && pe2 instanceof Activity) {
+                    Activity a1 = (Activity) pe1;
+                    Activity a2 = (Activity) pe2;
+
+                    // Compare activity details
+                    if (!a1.getType().equals(a2.getType()) ||
+                            a1.getEndTime() != a2.getEndTime() ||
+                            !a1.getCoord().equals(a2.getCoord())) {
+                        return false;
+                    }
+                } else if (pe1 instanceof Leg && pe2 instanceof Leg) {
+                    Leg l1 = (Leg) pe1;
+                    Leg l2 = (Leg) pe2;
+
+                    // Compare leg details, for example the mode of transportation and departure time
+                    if (!l1.getMode().equals(l2.getMode())) {
+                        return false;
+                    }
+                    if (!(l1.getDepartureTime().seconds()==l2.getDepartureTime().seconds())) {
+                        return false;
+                    }
+                    // Additional comparisons can be made here based on your specific requirements
+                } else {
+                    // If the types of plan elements do not match, the plans are not identical
+                    return false;
+                }
+            }
         }
 
         return true;
     }
 }
-
