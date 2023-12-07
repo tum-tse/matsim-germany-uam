@@ -19,7 +19,7 @@ public class PopulationMerger {
 
     public static void main(String[] args) {
         String folderPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/prepare-for-merge"; // Replace with your folder path
-        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_100percent.xml.gz"; // Path for the merged file
+        String mergedPopulationPath = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/all_trips_2030_merged_cleaned_100percent.xml.gz"; // Path for the merged file
 
         Config config = ConfigUtils.createConfig();
         Population mergedPopulation = ScenarioUtils.createScenario(config).getPopulation();
@@ -86,9 +86,7 @@ public class PopulationMerger {
             Plan plan2 = person2.getPlans().get(i);
 
             // Compare details of each plan (you may need to extend this comparison based on your plan structure)
-            if (!plan1.equals(plan2)) {
-                return false;
-            }
+            System.exit(-1);
         }
 
         return true;

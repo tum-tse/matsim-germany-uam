@@ -20,6 +20,8 @@ import org.matsim.vehicles.MatsimVehicleWriter;
 
 public class RunGermanyScenario {
 
+    //TODO for SHK: How to deal with the agents whose activity is outside of the Germany network?
+
     private static final Logger logger = Logger.getLogger(RunGermanyScenario.class);
 
     public static void main(String[] args) {
@@ -46,7 +48,7 @@ public class RunGermanyScenario {
             config.network().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/final-version/network_with-rail.xml.gz");
             config.transit().setTransitScheduleFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_transitSchedule.xml.gz");
             config.transit().setVehiclesFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_vsp/Germany/input/2020_Train_GTFS_transitVehicles.xml.gz");
-            config.plans().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/short-distance_Hao/trips_germanySD_2030_1percent.xml.gz");
+            config.plans().setInputFile("/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_1percent_base_merged.xml.gz");
 
             //MutableScenario matsimScenario = (MutableScenario) ScenarioUtils.loadScenario(config);
             Scenario matsimScenario = ScenarioUtils.loadScenario(config) ;

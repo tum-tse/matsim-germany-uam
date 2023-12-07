@@ -84,6 +84,7 @@ public class ConfigureMatsim {
         config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
         config.strategy().setMaxAgentPlanMemorySize(4);
 
+        // For short distance trips
         PlanCalcScoreConfigGroup.ActivityParams homeActivity = new PlanCalcScoreConfigGroup.ActivityParams("home");
         homeActivity.setTypicalDuration(12 * 60 * 60);
         config.planCalcScore().addActivityParams(homeActivity);
@@ -108,6 +109,23 @@ public class ConfigureMatsim {
         airportActivity.setTypicalDuration(1 * 60 * 60);
         config.planCalcScore().addActivityParams(airportActivity);
 
+        // For long distance trips
+        PlanCalcScoreConfigGroup.ActivityParams privateActivity = new PlanCalcScoreConfigGroup.ActivityParams("private");
+        privateActivity.setTypicalDuration(1 * 60 * 60); //TODO: need to set the value correctly!
+        config.planCalcScore().addActivityParams(privateActivity);
+
+        PlanCalcScoreConfigGroup.ActivityParams businessActivity = new PlanCalcScoreConfigGroup.ActivityParams("business");
+        businessActivity.setTypicalDuration(1 * 60 * 60); //TODO: need to set the value correctly!
+        config.planCalcScore().addActivityParams(businessActivity);
+
+        PlanCalcScoreConfigGroup.ActivityParams leisureActivity = new PlanCalcScoreConfigGroup.ActivityParams("leisure");
+        leisureActivity.setTypicalDuration(1 * 60 * 60); //TODO: need to set the value correctly!
+        config.planCalcScore().addActivityParams(leisureActivity);
+
+        PlanCalcScoreConfigGroup.ActivityParams visitorActivity = new PlanCalcScoreConfigGroup.ActivityParams("visitor");
+        visitorActivity.setTypicalDuration(1 * 60 * 60); //TODO: need to set the value correctly!
+        config.planCalcScore().addActivityParams(visitorActivity);
+
 /*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("carPassenger"); // TODO: I think we do not need to do this for car mode
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
         config.plansCalcRoute().addModeRoutingParams(carPassengerParams);*/
@@ -128,7 +146,7 @@ public class ConfigureMatsim {
         walkParams.setTeleportedModeSpeed(5 / 3.6);
         config.plansCalcRoute().addModeRoutingParams(walkParams);
 
-        String runId = "tse_germany_model";
+        String runId = "tse_germany_scenario";
         config.controler().setRunId(runId);
         //config.network().setInputFile();
 
@@ -280,6 +298,7 @@ public class ConfigureMatsim {
 
 
 
+    @Deprecated
     public static void setDemandSpecificConfigSettings(Config config) {
 
         config.qsim().setFlowCapFactor(siloSamplingFactor);
