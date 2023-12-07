@@ -15,8 +15,8 @@ public class AltoPopulationCleaner {
     final static double endTime = 3600 * 15; //TODO for SHK: need to define the end time for these activities whose end time is missing!
 
     public static void main(String[] args) {
-        String inputFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_merged.xml.gz"; // Replace with your input file path
-        String outputFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_merged_cleaned.xml.gz"; // Replace with your output file path
+        String inputFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base.xml.gz"; // Replace with your input file path
+        String outputFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/long-distance_Wei/LDGermany_2030_Weekday_100percent_base_cleaned.xml.gz"; // Replace with your output file path
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
@@ -46,9 +46,8 @@ public class AltoPopulationCleaner {
                     }
                 }
             }
-
-            PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
-            writer.write(outputFile);
         }
+        PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
+        writer.write(outputFile);
     }
 }
