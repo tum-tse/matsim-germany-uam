@@ -1,6 +1,7 @@
 package org.matsim.tse.demand;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,8 +33,10 @@ public class AltoPopulationCleaner {
                 for (PlanElement element : plan.getPlanElements()) {
                     if (element instanceof Leg) {
                         Leg leg = (Leg) element;
-                        if (leg.getMode().equals("auto") || leg.getMode().equals("air")) { //TODO: need to introduce "air" mode into the simulation
-                            leg.setMode("car");
+                        if (leg.getMode().equals("auto")) {
+                            leg.setMode(TransportMode.car);
+                        } else if (leg.getMode().equals("air")) {
+                            leg.setMode(TransportMode.airplane);
                         }
 
                         // set the departure time same as the end time of the previous activity

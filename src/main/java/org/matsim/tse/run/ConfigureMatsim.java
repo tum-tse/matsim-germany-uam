@@ -61,7 +61,7 @@ public class ConfigureMatsim {
             strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
         }
-        String[] subtourModes = new String[]{TransportMode.car, /*"carPassenger",*/ "longDistancePt", TransportMode.bike, TransportMode.walk}; //TODO: need to set the scoring params for carPassenger correctly!
+        String[] subtourModes = new String[]{TransportMode.car, /*"carPassenger",*/ "longDistancePt", TransportMode.bike, TransportMode.walk, TransportMode.airplane}; //TODO: need to set the scoring params for carPassenger correctly!
         String[] chainBasedModes = new String[]{TransportMode.car, TransportMode.bike};
         config.subtourModeChoice().setModes(subtourModes);
         config.subtourModeChoice().setChainBasedModes(chainBasedModes);
@@ -136,15 +136,20 @@ public class ConfigureMatsim {
         ptParams.setTeleportedModeSpeed(50 / 3.6);
         config.plansCalcRoute().addModeRoutingParams(ptParams);*/
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams bicycleParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("bike");
+        PlansCalcRouteConfigGroup.ModeRoutingParams bicycleParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.bike);
         bicycleParams.setBeelineDistanceFactor(1.3);
         bicycleParams.setTeleportedModeSpeed(15 / 3.6);
         config.plansCalcRoute().addModeRoutingParams(bicycleParams);
 
-        PlansCalcRouteConfigGroup.ModeRoutingParams walkParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("walk");
+        PlansCalcRouteConfigGroup.ModeRoutingParams walkParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
         walkParams.setBeelineDistanceFactor(1.3);
         walkParams.setTeleportedModeSpeed(5 / 3.6);
         config.plansCalcRoute().addModeRoutingParams(walkParams);
+
+        PlansCalcRouteConfigGroup.ModeRoutingParams airplaneParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.airplane);
+        airplaneParams.setBeelineDistanceFactor(1.0);
+        airplaneParams.setTeleportedModeSpeed(800 / 3.6); //TODO for SHK: For commercial airliners, the average cruising speeds typically range from 550 to 600 mph (approximately 885 to 965 km/h), while takeoff speeds are generally between 130 to 180 mph (about 209 to 290 km/h), and landing speeds are usually around 160 to 180 mph (257 to 290 km/h).
+        config.plansCalcRoute().addModeRoutingParams(airplaneParams);
 
         String runId = "tse_germany_scenario";
         config.controler().setRunId(runId);
