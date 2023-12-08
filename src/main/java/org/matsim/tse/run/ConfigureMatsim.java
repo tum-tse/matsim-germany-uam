@@ -251,14 +251,14 @@ public class ConfigureMatsim {
         scoreLocalPublicTransport.setMonetaryDistanceRate(0);
         config.planCalcScore().addModeParams(scoreLocalPublicTransport);
 
-/*        ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
+        ModeParams scoreAirplane = new ModeParams(TransportMode.airplane);
         scoreAirplane.setConstant(-15);
         scoreAirplane.setDailyMonetaryConstant(scorePt.getDailyMonetaryConstant());
         scoreAirplane.setDailyUtilityConstant(scorePt.getDailyUtilityConstant());
         scoreAirplane.setMarginalUtilityOfDistance(scorePt.getMarginalUtilityOfDistance());
         scoreAirplane.setMarginalUtilityOfTraveling(-6);
-        scoreAirplane.setMonetaryDistanceRate(-0.0001);
-        config.planCalcScore().addModeParams(scoreAirplane);*/
+        scoreAirplane.setMonetaryDistanceRate(-0.0001); //TODO for SHK: define the correct scoring params for the mode airplane
+        config.planCalcScore().addModeParams(scoreAirplane);
 
         config.addModule(srrConfig);
 
