@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class PopulationSampler {
 
-    private static final Random random = new Random(0);
+    private static final Random random = new Random(4711);
 
     public static void main(String[] args) {
         String inputPopulationFile = "/home/tumtse/Documents/haowu/MSM/matsim-germany_msm/matsim-format/all-trips/plan_all-trips_2030_100percent.xml.gz"; // replace with your input file path

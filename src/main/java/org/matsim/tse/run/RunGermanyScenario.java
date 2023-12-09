@@ -3,6 +3,7 @@ package org.matsim.tse.run;
 import ch.sbb.matsim.routing.pt.raptor.RaptorParametersForPerson;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -53,6 +54,10 @@ public class RunGermanyScenario {
             //MutableScenario matsimScenario = (MutableScenario) ScenarioUtils.loadScenario(config);
             Scenario matsimScenario = ScenarioUtils.loadScenario(config) ;
             Controler controler = new Controler(matsimScenario);
+
+            // TODO for SHK: solve the below quick fix
+            matsimScenario.getNetwork().removeLink(matsimScenario.getNetwork().getLinks().get(Id.createLinkId(1795223)).getId());
+            //matsimScenario.getNetwork().removeLink(matsimScenario.getNetwork().getLinks().get(Id.createLinkId(1795222)).getId());
 
             // use the (congested) car travel time for the teleported carPassenger mode
             // Seems like a nice trick, but does not work so well: All carPassenger trips found in the 0th iteration use the free speed travel time, which is much too fast.  And they
