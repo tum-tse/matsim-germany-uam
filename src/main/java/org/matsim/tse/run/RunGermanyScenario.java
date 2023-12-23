@@ -16,7 +16,6 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.run.AirplaneTrainSwitcherIndividualRaptorParametersForPerson;
-import org.matsim.run.MyMainModeIdentifier;
 import org.matsim.vehicles.MatsimVehicleWriter;
 
 public class RunGermanyScenario {
