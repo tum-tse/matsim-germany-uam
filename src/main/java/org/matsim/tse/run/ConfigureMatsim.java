@@ -17,15 +17,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 
 public class ConfigureMatsim {
 
-    public static double siloSamplingFactor = 0.01; //TODO: my own setting, need to check if this is correct
+    public static double siloSamplingFactor = 0.01;
 
     public static final String longDistanceTrain = 		"longDistanceTrain";
     public static final String regionalTrain = 			"regionalTrain";
     public static final String localPublicTransport = 		"localPublicTransport";
 
     public static Config configureMatsim() {
-
-
 
         //String outputDirectory = outputDirectoryRoot + "/" + runId + "/";
         //matsimConfig.controler().setRunId(runId);
@@ -35,7 +33,7 @@ public class ConfigureMatsim {
         config.controler().setLastIteration(200);
         config.controler().setMobsim("qsim");
         config.controler().setWritePlansInterval(1);
-        config.controler().setWriteEventsInterval(1); //TODO: need to fix!
+        config.controler().setWriteEventsInterval(1);
         config.controler().setWriteTripsInterval(1);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -126,11 +124,11 @@ public class ConfigureMatsim {
         visitorActivity.setTypicalDuration(1 * 60 * 60); //TODO: need to set the value correctly!
         config.planCalcScore().addActivityParams(visitorActivity);
 
-/*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("carPassenger"); // TODO: I think we do not need to do this for car mode
+/*        PlansCalcRouteConfigGroup.ModeRoutingParams carPassengerParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("carPassenger");
         carPassengerParams.setTeleportedModeFreespeedFactor(1.0);
         config.plansCalcRoute().addModeRoutingParams(carPassengerParams);*/
 
-/*        //TODO: need to model pt
+/*
         PlansCalcRouteConfigGroup.ModeRoutingParams ptParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("longDistancePt");
         ptParams.setBeelineDistanceFactor(1.5);
         ptParams.setTeleportedModeSpeed(50 / 3.6);
@@ -196,13 +194,13 @@ public class ConfigureMatsim {
         srrConfig.addModeMappingForPassengers(modeMappingTrainLocalPublicTransport);
 
         //TODO: need to check if this is neccessary!
-        srrConfig.setUseIntermodalAccessEgress(true);
+/*        srrConfig.setUseIntermodalAccessEgress(true);
         SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetWalk = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
         intermodalAccessEgressParameterSetWalk.setMode("walk");
         intermodalAccessEgressParameterSetWalk.setMaxRadius(5 * 1000);
         intermodalAccessEgressParameterSetWalk.setInitialSearchRadius(1 * 1000);
         intermodalAccessEgressParameterSetWalk.setSearchExtensionRadius(1 * 1000);
-        srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetWalk);
+        srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetWalk);*/
 /*        SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetAirportWithCar = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
         intermodalAccessEgressParameterSetAirportWithCar.setMode("car");
         intermodalAccessEgressParameterSetAirportWithCar.setMaxRadius(200 * 1000);
@@ -263,14 +261,9 @@ public class ConfigureMatsim {
         config.addModule(srrConfig);
 
         //config.transit().setInputScheduleCRS("EPSG:31467");
-        //TODO: need to also set the CRS for pt network
 
 
 
-
-        config.controler().setLastIteration(200); //TODO: my own setting
-        config.controler().setWritePlansInterval(config.controler().getLastIteration());
-        config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 
         config.qsim().setStuckTime(10);
 

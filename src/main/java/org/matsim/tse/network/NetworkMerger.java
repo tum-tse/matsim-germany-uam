@@ -86,7 +86,10 @@ public class NetworkMerger {
                 node.getAttributes().getAsMap().forEach((attributeKey, attributeValue) -> {
                     newNode.getAttributes().putAttribute(attributeKey, attributeValue);
                 });
-                //TODO: if adding Inlinks and outlinks is necessary
+                //TODO: if adding Inlinks and Outlinks is necessary
+                // add inlinks and outlinks to the new node
+                node.getInLinks().values().forEach(newNode::addInLink);
+                node.getOutLinks().values().forEach(newNode::addOutLink);
                 roadNetwork.addNode(newNode);
             }else {
                 roadNetwork.addNode(node);
