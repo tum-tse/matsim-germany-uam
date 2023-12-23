@@ -59,7 +59,7 @@ public class ConfigureMatsim {
             strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
         }
-        String[] subtourModes = new String[]{TransportMode.car, /*"carPassenger",*/ "longDistancePt", TransportMode.bike, TransportMode.walk, TransportMode.airplane}; //TODO: need to set the scoring params for carPassenger correctly!
+        String[] subtourModes = new String[]{TransportMode.car, "carPassenger", "longDistancePt", TransportMode.bike, TransportMode.walk, TransportMode.airplane};
         String[] chainBasedModes = new String[]{TransportMode.car, TransportMode.bike};
         config.subtourModeChoice().setModes(subtourModes);
         config.subtourModeChoice().setChainBasedModes(chainBasedModes);
@@ -193,7 +193,6 @@ public class ConfigureMatsim {
         modeMappingTrainLocalPublicTransport.setRouteMode(localPublicTransport);
         srrConfig.addModeMappingForPassengers(modeMappingTrainLocalPublicTransport);
 
-        //TODO: need to check if this is neccessary!
 /*        srrConfig.setUseIntermodalAccessEgress(true);
         SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetWalk = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
         intermodalAccessEgressParameterSetWalk.setMode("walk");
@@ -257,6 +256,10 @@ public class ConfigureMatsim {
         scoreAirplane.setMarginalUtilityOfTraveling(-6);
         scoreAirplane.setMonetaryDistanceRate(-0.0001); //TODO for SHK: define the correct scoring params for the mode airplane
         config.planCalcScore().addModeParams(scoreAirplane);
+
+        ModeParams rideScore = config.planCalcScore().getModes().get(TransportMode.ride);
+        rideScore.setMode("carPassenger");
+        config.planCalcScore().addModeParams(rideScore);
 
         config.addModule(srrConfig);
 

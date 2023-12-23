@@ -61,7 +61,7 @@ public class NetworkMerger {
         Scenario scenario = ScenarioUtils.createScenario(config);
         Network trainNetwork = originalrailNetwork;
         Set<String> trainModes = new HashSet<>();
-        trainModes.add(TransportMode.train); //TODO: Check if this is necessary
+        //trainModes.add(TransportMode.train);
         trainModes.add(longDistanceTrain);
         trainModes.add(regionalTrain);
         trainModes.add(localPublicTransport);
@@ -70,7 +70,7 @@ public class NetworkMerger {
         Network railNetwork = scenario.getNetwork();
 
         // Clean the rail network
-        //new NetworkCleaner().run(railNetwork); //TODO: Check if this is necessary
+        //new NetworkCleaner().run(railNetwork);
 
         // Merge rail network into road network with renaming in case of duplicates
         railNetwork.getNodes().values().forEach(node -> {
@@ -86,7 +86,6 @@ public class NetworkMerger {
                 node.getAttributes().getAsMap().forEach((attributeKey, attributeValue) -> {
                     newNode.getAttributes().putAttribute(attributeKey, attributeValue);
                 });
-                //TODO: if adding Inlinks and Outlinks is necessary
                 // add inlinks and outlinks to the new node
                 node.getInLinks().values().forEach(newNode::addInLink);
                 node.getOutLinks().values().forEach(newNode::addOutLink);

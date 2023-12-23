@@ -34,6 +34,7 @@ public final class MyMainModeIdentifier implements AnalysisMainModeIdentifier {
         modeHierarchy.add( TransportMode.drt ) ;
         modeHierarchy.add( TransportMode.pt ) ;
         modeHierarchy.add( TransportMode.ride ) ;
+        modeHierarchy.add( "carPassenger" ) ;
         modeHierarchy.add( TransportMode.car ) ;
         modeHierarchy.add( "localPublicTransport" ) ;
         modeHierarchy.add( "regionalTrain" ) ;
