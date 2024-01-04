@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 public class ConfigureMatsim {
 
@@ -32,43 +33,46 @@ public class ConfigureMatsim {
         config.controler().setFirstIteration(0);
         config.controler().setLastIteration(200);
         config.controler().setMobsim("qsim");
-        config.controler().setWritePlansInterval(1);
-        config.controler().setWriteEventsInterval(1);
+        config.controler().setWritePlansInterval(10);
+        config.controler().setWriteEventsInterval(10);
         config.controler().setWriteTripsInterval(1);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
         config.qsim().setEndTime(26 * 3600);
-        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
+        config.qsim().setUsingTravelTimeCheckInTeleportation( true ); //TODO: Need to check what does this do?
+        config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
         //config.vspExperimental().setWritingOutputEvents(true); // writes final events into toplevel directory
 
+        config.strategy().clearStrategySettings();
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName("ChangeExpBeta");
+            strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
             strategySettings.setWeight(0.85);
             config.strategy().addStrategySettings(strategySettings);
         }
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName("ReRoute");
+            strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute);
             strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
         }
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName("SubtourModeChoice");
+            strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
             strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
         }
-        String[] subtourModes = new String[]{TransportMode.car, "carPassenger", "longDistancePt", TransportMode.bike, TransportMode.walk, TransportMode.airplane};
+        String[] subtourModes = new String[]{TransportMode.car, "carPassenger", "longDistancePt", TransportMode.bike, TransportMode.walk, TransportMode.airplane}; //or DefaultStrategy.ChangeTripMode?
         String[] chainBasedModes = new String[]{TransportMode.car, TransportMode.bike};
         config.subtourModeChoice().setModes(subtourModes);
         config.subtourModeChoice().setChainBasedModes(chainBasedModes);
 
         {
             StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName("TimeAllocationMutator");
+            strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.TimeAllocationMutator_ReRoute);
             strategySettings.setWeight(0.05);
             config.strategy().addStrategySettings(strategySettings);
+            //config.timeAllocationMutator().setMutationRange(600.);
         }
 //        {
 //            config.timeAllocationMutator().setMutationRange(1800);
@@ -80,7 +84,7 @@ public class ConfigureMatsim {
 //        }
 
         config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-        config.strategy().setMaxAgentPlanMemorySize(4);
+        config.strategy().setMaxAgentPlanMemorySize(4); //TODO: TBD: should be set to 10?
 
         // For short distance trips
         PlanCalcScoreConfigGroup.ActivityParams homeActivity = new PlanCalcScoreConfigGroup.ActivityParams("home");
@@ -169,7 +173,7 @@ public class ConfigureMatsim {
         config.changeMode().setModes(changeModes);
 
         config.transit().setUseTransit(true);
-        //config.transitRouter().setMaxBeelineWalkConnectionDistance(500);
+        config.transitRouter().setMaxBeelineWalkConnectionDistance(500);
         Set<String> transitModes = new HashSet<>();
 //		transitModes.add(TransportMode.train);
 //		transitModes.add(TransportMode.airplane);
@@ -200,15 +204,12 @@ public class ConfigureMatsim {
         intermodalAccessEgressParameterSetWalk.setInitialSearchRadius(1 * 1000);
         intermodalAccessEgressParameterSetWalk.setSearchExtensionRadius(1 * 1000);
         srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetWalk);*/
-/*        SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet intermodalAccessEgressParameterSetAirportWithCar = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
-        intermodalAccessEgressParameterSetAirportWithCar.setMode("car");
-        intermodalAccessEgressParameterSetAirportWithCar.setMaxRadius(200 * 1000);
-        intermodalAccessEgressParameterSetAirportWithCar.setInitialSearchRadius(50 * 1000);
-        intermodalAccessEgressParameterSetAirportWithCar.setSearchExtensionRadius(50 * 1000);
-        intermodalAccessEgressParameterSetAirportWithCar.setStopFilterAttribute("type");
-        intermodalAccessEgressParameterSetAirportWithCar.setStopFilterValue("airport");
-        srrConfig.addIntermodalAccessEgress(intermodalAccessEgressParameterSetAirportWithCar);*/
 
+        config.addModule(srrConfig);
+
+        ModeParams scoreCar = config.planCalcScore().getModes().get(TransportMode.car);
+        scoreCar.setMonetaryDistanceRate(-0.0001);
+        scoreCar.setMarginalUtilityOfTraveling(-6);
 
         ModeParams scorePt = config.planCalcScore().getModes().get(TransportMode.pt);
 
@@ -260,8 +261,6 @@ public class ConfigureMatsim {
         ModeParams rideScore = config.planCalcScore().getModes().get(TransportMode.ride);
         rideScore.setMode("carPassenger");
         config.planCalcScore().addModeParams(rideScore);
-
-        config.addModule(srrConfig);
 
         //config.transit().setInputScheduleCRS("EPSG:31467");
 
